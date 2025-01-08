@@ -67,7 +67,7 @@ fun PaginaPrincipal(navController: NavController, viewModel: MainViewModel) {
                     containerColor = Color.Transparent
                 )
             ) {
-                Icon(Icons.Rounded.Menu, contentDescription = "menuBusqueda")
+                Icon(Icons.Rounded.Menu, contentDescription = "menuBusqueda",tint = Color.White)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -112,59 +112,50 @@ fun PaginaPrincipal(navController: NavController, viewModel: MainViewModel) {
                         .padding(horizontal = 40.dp), Arrangement.SpaceEvenly, Alignment.CenterVertically
                 ) {
                     Button(
-                        onClick = {},
+                        onClick = {navController.navigate("paginaPrincipal")},
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                     ) {
                         Text(
                             text = "Entrenamiento",
                             color = Color.Black,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             style = TextStyle(
                                 textDecoration = TextDecoration.Underline,
-                                fontSize = 13.sp
+                                fontSize = 12.sp
                             )
                         )
                     }
                     Button(
-                        onClick = {},
+                        onClick = {navController.navigate("paginaCrearEntrenamiento")},
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                     ) {
                         Text(
                             text = "Crear",
                             color = Color.Black,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             style = TextStyle(
                                 textDecoration = TextDecoration.Underline,
-                                fontSize = 13.sp
+                                fontSize = 12.sp
                             )
                         )
                     }
                     Button(
-                        onClick = {},
+                        onClick = {navController.navigate("paginaCalendario")},
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                     ) {
                         Text(
                             text = "Calendario",
                             color = Color.Black,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             style = TextStyle(
                                 textDecoration = TextDecoration.Underline,
-                                fontSize = 13.sp
+                                fontSize = 12.sp
                             )
                         )
                     }
                 }
                 LazyEntrenamiento(entrenamientos = entrenamientos)
             }
-
-
-
-
-        }
-
-
-        Button(onClick = { navController.navigate("paginaPrueba") }) {
-            Text(text = "pagina A", color = Color.Black)
         }
     }
 }
@@ -172,12 +163,24 @@ fun PaginaPrincipal(navController: NavController, viewModel: MainViewModel) {
 @Composable
 
 fun LazyEntrenamiento(entrenamientos: List<Entrenamientos>) {
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(entrenamientos) { entrenamiento ->
-            CardEntrenamientos(entrenamiento = entrenamiento)
+    if (entrenamientos.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "No hay entrenamientos disponibles",
+                style = TextStyle(fontSize = 20.sp, color = Color.Gray)
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(entrenamientos) { entrenamiento ->
+                CardEntrenamientos(entrenamiento = entrenamiento)
+            }
         }
     }
 }
@@ -187,10 +190,49 @@ fun CardEntrenamientos(entrenamiento: Entrenamientos) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(PaddingValues(10.dp, 10.dp, 10.dp, 0.dp)),
+            .padding(10.dp),
         elevation = CardDefaults.cardElevation(5.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Black)
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ){
+                Text(
+                    text = entrenamiento.dia,
+                    style = TextStyle(fontSize = 20.sp, color = Color.White)
+                )
+                Text(
+                    text = "->",
+                    color = Color.White
+                )
+                Text(
+                    text = entrenamiento.nombre,
+                    style = TextStyle(fontSize = 20.sp, color = Color.White)
+                )
+
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor  = Color.Gray,
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Text(text = "Iniciar", color = Color.White)
+                }
+            }
+
+        }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -199,24 +241,8 @@ fun CardEntrenamientos(entrenamiento: Entrenamientos) {
                 .padding(10.dp)
         ) {
             Text(
-                text = entrenamiento.dia,
-                style = TextStyle(fontSize = 20.sp, color = Color.Black)
-            )
-
-            Button(onClick = {}) {
-                Text(text = entrenamiento.empezar, color = Color.White)
-            }
-        }
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Text(
                 text = entrenamiento.entrenamiento,
-                style = TextStyle(fontSize = 15.sp, color = Color.Black)
+                style = TextStyle(fontSize = 15.sp, color = Color.White)
             )
         }
     }
