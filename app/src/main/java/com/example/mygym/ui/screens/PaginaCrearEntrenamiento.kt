@@ -90,7 +90,7 @@ fun PaginaPrueba(navController: NavController, viewModel: MainViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Hola, Usuario", color = Color.White, fontSize = 30.sp)
+            Text(text = "Hola, " + viewModel.nombreUsuario, color = Color.White, fontSize = 30.sp)
             Text(text = "25", color = Color.White, fontSize = 30.sp)
         }
 
@@ -228,9 +228,9 @@ fun CardEntrenamientos2(entrenamiento: Entrenamientos, navController: NavControl
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(PaddingValues(10.dp, 10.dp, 10.dp, 0.dp)),
+            .padding(10.dp),
         elevation = CardDefaults.cardElevation(5.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Black)
     ) {
         Row(
@@ -238,21 +238,23 @@ fun CardEntrenamientos2(entrenamiento: Entrenamientos, navController: NavControl
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(12.dp)
         ) {
             Text(
                 text = entrenamiento.nombre,
-                style = TextStyle(fontSize = 15.sp, color = Color.White)
+                style = TextStyle(fontSize = 15.sp, color = Color.White),
+                modifier = Modifier.padding(start = 16.dp)
             )
             Button(
+                modifier = Modifier.padding(end = 15.dp),
                 onClick = { navController.navigate("edicionEntrenamiento") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Create,
                     contentDescription = "moreVert",
-                    modifier = Modifier.size(10.dp),
-                    tint = Color.White
+                    modifier = Modifier.size(20.dp),
+                    tint = Color.White,
                 )
             }
 

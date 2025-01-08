@@ -105,7 +105,7 @@ fun InicioSesion(
                 Button(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                     onClick = {
-                        if (username == "USER" && password == "USER") {
+                        if (username == "" && password == "") {
                             navController.navigate("paginaPrincipal")
                         } else {
                             aviso = "Usuario no válido"

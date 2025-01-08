@@ -42,6 +42,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -75,7 +76,8 @@ fun CrearEntrenamiento(
             diaInput = diaInput,
             onDiaChange = { diaInput = it },
             entrenamientoInput = entrenamientoInput,
-            onEntrenamientoChange = { entrenamientoInput = it }
+            onEntrenamientoChange = { entrenamientoInput = it },
+            viewModel = viewModel
         )
     }
 }
@@ -117,7 +119,10 @@ fun RellenarCampos(
     onDiaChange: (String) -> Unit,
     entrenamientoInput: String,
     onEntrenamientoChange: (String) -> Unit,
+    viewModel: MainViewModel
 ) {
+    val dias = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+    val diasAbreviados = listOf("L", "M", "X", "J", "V", "S", "D")
     Column(
         modifier = Modifier
             .padding(innerPadding)
@@ -134,18 +139,44 @@ fun RellenarCampos(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = diaInput,
-            onValueChange = onDiaChange,
-            label = { Text(text = "Día") },
-            shape = RoundedCornerShape(30.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
             value = entrenamientoInput,
             onValueChange = onEntrenamientoChange,
             label = { Text(text = "Entrenamiento") },
             shape = RoundedCornerShape(30.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "¿Qué día quieres entrenar?")
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            diasAbreviados.forEachIndexed { index, abreviatura ->
+                Button(
+                    onClick = { viewModel.dia = dias[index] },
+                    modifier = Modifier.size(40.dp),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Text(text = abreviatura, fontSize = 12.sp, color = Color.Black)
+                }
+            }
+        }
+        Text(
+            text = "Día seleccionado: ${viewModel.dia}",
+            fontSize = 16.sp,
+            modifier = Modifier.padding(top = 16.dp)
         )
     }
 }
@@ -168,14 +199,15 @@ fun BotonGuardar(
             Button(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 onClick = {
-
+                    val diaInput = viewModel.dia
                     if (nombreInput.isNotBlank() && diaInput.isNotBlank() && entrenamientoInput.isNotBlank()) {
                         val nuevoEntrenamiento = Entrenamientos(
-                            id = "",
+                            id = 0,
                             nombre = nombreInput,
                             dia = diaInput,
                             entrenamiento = entrenamientoInput
                         )
+
                         viewModel.entrenamientos = viewModel.entrenamientos + nuevoEntrenamiento
                         navController.navigate("paginaPrincipal")
                     }
@@ -183,7 +215,7 @@ fun BotonGuardar(
                 modifier = Modifier
                     .padding(16.dp)
             ) {
-                Text(text = "Guardar",color = Color.Black)
+                Text(text = "Guardar", color = Color.Black)
             }
         }
     }

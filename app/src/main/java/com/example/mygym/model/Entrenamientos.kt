@@ -1,7 +1,7 @@
 package com.example.mygym.model
 
 data class Entrenamientos (
-    val id: String,
+    val id: Int,
     val nombre: String,
     val dia: String,
     val entrenamiento: String,

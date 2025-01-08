@@ -91,7 +91,7 @@ fun PaginaPrincipal(navController: NavController, viewModel: MainViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Hola, Usuario", color = Color.White, fontSize = 30.sp)
+            Text(text = "Hola, " + viewModel.nombreUsuario, color = Color.White, fontSize = 30.sp)
             Text(text = "25", color = Color.White, fontSize = 30.sp)
         }
 
