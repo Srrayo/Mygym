@@ -48,6 +48,8 @@ fun PaginaCalendario(navController: NavController, viewModel: MainViewModel){
         ) {
             Button(
                 onClick = {},
+
+
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent
                 )

@@ -5,4 +5,5 @@ data class Entrenamientos (
     val nombre: String,
     val dia: String,
     val entrenamiento: String,
+    val categoriaEntrenamientos: List<CategoriaEntrenamientos>
 )

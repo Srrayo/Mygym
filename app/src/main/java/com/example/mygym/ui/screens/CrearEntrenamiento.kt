@@ -1,6 +1,7 @@
 package com.example.mygym.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,11 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -38,11 +44,15 @@ import androidx.navigation.NavController
 import com.example.mygym.model.Entrenamientos
 import com.example.mygym.model.MainViewModel
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.unit.sp
+import com.example.mygym.model.CategoriaEntrenamientos
 
 
 @Composable
@@ -53,6 +63,12 @@ fun CrearEntrenamiento(
     var nombreInput by remember { mutableStateOf(viewModel.nombre) }
     var diaInput by remember { mutableStateOf(viewModel.dia) }
     var entrenamientoInput by remember { mutableStateOf(viewModel.entrenamiento) }
+    var categoriaEntrenamientos = CategoriaEntrenamientos.values().toList()
+    var categoriaEntrenameintoInput by remember {
+        mutableStateOf<List<CategoriaEntrenamientos>>(
+            emptyList()
+        )
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -64,8 +80,8 @@ fun CrearEntrenamiento(
                 navController = navController,
                 viewModel = viewModel,
                 nombreInput = nombreInput,
-                diaInput = diaInput,
-                entrenamientoInput = entrenamientoInput
+                entrenamientoInput = entrenamientoInput,
+                categoriaEntrenameintoInput = categoriaEntrenameintoInput
             )
         },
     ) { innerPadding ->
@@ -77,7 +93,9 @@ fun CrearEntrenamiento(
             onDiaChange = { diaInput = it },
             entrenamientoInput = entrenamientoInput,
             onEntrenamientoChange = { entrenamientoInput = it },
-            viewModel = viewModel
+            viewModel = viewModel,
+            categoriaEntrenameintoInput = categoriaEntrenameintoInput,
+            onCategoriaChange = { categoriaEntrenameintoInput = it }
         )
     }
 }
@@ -119,7 +137,9 @@ fun RellenarCampos(
     onDiaChange: (String) -> Unit,
     entrenamientoInput: String,
     onEntrenamientoChange: (String) -> Unit,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    categoriaEntrenameintoInput: List<CategoriaEntrenamientos>,
+    onCategoriaChange: (List<CategoriaEntrenamientos>) -> Unit,
 ) {
     val dias = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
     val diasAbreviados = listOf("L", "M", "X", "J", "V", "S", "D")
@@ -164,7 +184,12 @@ fun RellenarCampos(
             verticalAlignment = Alignment.CenterVertically
         ) {
             diasAbreviados.forEachIndexed { index, abreviatura ->
+                val isSelected = viewModel.dia == dias[index]
                 Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSelected) Color.Green else Color.White,
+                        contentColor = Color.White
+                    ),
                     onClick = { viewModel.dia = dias[index] },
                     modifier = Modifier.size(40.dp),
                     contentPadding = PaddingValues(0.dp)
@@ -173,11 +198,77 @@ fun RellenarCampos(
                 }
             }
         }
-        Text(
-            text = "Día seleccionado: ${viewModel.dia}",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 16.dp)
-        )
+        //Text(
+        //text = "Día seleccionado: ${viewModel.dia}",
+        //fontSize = 16.sp,
+        //modifier = Modifier.padding(top = 16.dp),
+        //color = Color.White
+        //)
+
+        Text(text = "Elige tu categoría")
+        var expanded by remember { mutableStateOf(false) }
+        var categoriaEntrenameintoInput by remember {
+            mutableStateOf<List<CategoriaEntrenamientos>>(
+                emptyList()
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Text(text = "Gimnasio")
+
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Gimnasio") },
+                        onClick = {
+                            categoriaEntrenameintoInput = listOf(CategoriaEntrenamientos.GIMNASIO)
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Cardio") },
+                        onClick = {
+                            categoriaEntrenameintoInput = listOf(CategoriaEntrenamientos.CARDIO)
+                            expanded = false
+                        }
+                    )
+                    //HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text("Fuerza") },
+                        onClick = {
+                            categoriaEntrenameintoInput = listOf(CategoriaEntrenamientos.FUERZA)
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Flexibilidad") },
+                        onClick = {
+                            categoriaEntrenameintoInput =
+                                listOf(CategoriaEntrenamientos.FLEXIBILIDAD)
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Entrenamientos Mixtos") },
+                        onClick = {
+                            categoriaEntrenameintoInput =
+                                listOf(CategoriaEntrenamientos.ENTRENAMIENTOSMIXTOS)
+                            expanded = false
+                        }
+                    )
+
+                }
+            }
+
+        }
     }
 }
 
@@ -186,8 +277,8 @@ fun BotonGuardar(
     navController: NavController,
     viewModel: MainViewModel,
     nombreInput: String,
-    diaInput: String,
     entrenamientoInput: String,
+    categoriaEntrenameintoInput: List<CategoriaEntrenamientos>
 ) {
     BottomAppBar {
         Row(
@@ -205,7 +296,9 @@ fun BotonGuardar(
                             id = 0,
                             nombre = nombreInput,
                             dia = diaInput,
-                            entrenamiento = entrenamientoInput
+                            entrenamiento = entrenamientoInput,
+                            categoriaEntrenamientos = categoriaEntrenameintoInput
+
                         )
 
                         viewModel.entrenamientos = viewModel.entrenamientos + nuevoEntrenamiento
