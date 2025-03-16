@@ -101,25 +101,6 @@ fun InicioSesion(
                 )
 
                 Spacer(modifier = Modifier.height(100.dp))
-
-                Button(
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    onClick = {
-                        if (username == "" && password == "") {
-                            navController.navigate("paginaPrincipal")
-                        } else {
-                            aviso = "Usuario no válido"
-                        }
-                    }
-                ) {
-                    Text(text = "Entrar", color = Color.White)
-                    // Icon(
-                    //imageVector = Icons.Rounded.PlayArrow,
-                    //contentDescription = "playArrow",
-                    // modifier = Modifier.size(20.dp)
-                    //)
-
-                }
             }
 
         }

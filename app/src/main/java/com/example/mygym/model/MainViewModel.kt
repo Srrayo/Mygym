@@ -1,39 +1,20 @@
 package com.example.mygym.model
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
-    var entrenamientos by mutableStateOf(emptyList<Entrenamientos>())
+    var entrenamientos by mutableStateOf(emptyList<CaracteristicasEntrenamientos>())
     var nombre by mutableStateOf("")
     var dia by mutableStateOf("")
     var entrenamiento by mutableStateOf("")
-    fun agregarEntrenamiento(entrenamiento: Entrenamientos) {
-        entrenamientos = entrenamientos + entrenamiento
-    }
-
     var nombreUsuario = "USER"
-    var contrasenaUsuario = "CONTRASENA"
 
-    var entrenamientoUser by mutableStateOf(
-        listOf(
-            Entrenamientos(
-                id = 0,
-                nombre,
-                dia,
-                entrenamiento,
-                categoriaEntrenamientos = listOf(
-                    CategoriaEntrenamientos.GIMNASIO,
-                    CategoriaEntrenamientos.CARDIO,
-                    CategoriaEntrenamientos.FUERZA,
-                    CategoriaEntrenamientos.FLEXIBILIDAD,
-                    CategoriaEntrenamientos.ENTRENAMIENTOSMIXTOS
-                )
-            )
-        )
-    )
+
 
 }

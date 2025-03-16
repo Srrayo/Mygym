@@ -11,25 +11,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,21 +31,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextDirection.Companion.Content
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.mygym.model.Entrenamientos
+import com.example.mygym.model.CaracteristicasEntrenamientos
 import com.example.mygym.model.MainViewModel
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.sp
-import com.example.mygym.model.CategoriaEntrenamientos
 
 
 @Composable
@@ -63,12 +53,7 @@ fun CrearEntrenamiento(
     var nombreInput by remember { mutableStateOf(viewModel.nombre) }
     var diaInput by remember { mutableStateOf(viewModel.dia) }
     var entrenamientoInput by remember { mutableStateOf(viewModel.entrenamiento) }
-    var categoriaEntrenamientos = CategoriaEntrenamientos.values().toList()
-    var categoriaEntrenameintoInput by remember {
-        mutableStateOf<List<CategoriaEntrenamientos>>(
-            emptyList()
-        )
-    }
+    var mensajeError by remember { mutableStateOf("") } // Estado para el mensaje de error
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -76,13 +61,6 @@ fun CrearEntrenamiento(
             CerrarVentana(navController)
         },
         bottomBar = {
-            BotonGuardar(
-                navController = navController,
-                viewModel = viewModel,
-                nombreInput = nombreInput,
-                entrenamientoInput = entrenamientoInput,
-                categoriaEntrenameintoInput = categoriaEntrenameintoInput
-            )
         },
     ) { innerPadding ->
         RellenarCampos(
@@ -94,8 +72,7 @@ fun CrearEntrenamiento(
             entrenamientoInput = entrenamientoInput,
             onEntrenamientoChange = { entrenamientoInput = it },
             viewModel = viewModel,
-            categoriaEntrenameintoInput = categoriaEntrenameintoInput,
-            onCategoriaChange = { categoriaEntrenameintoInput = it }
+            mensajeError = mensajeError // Pasa el mensaje de error
         )
     }
 }
@@ -123,11 +100,11 @@ fun CerrarVentana(
                 modifier = Modifier.size(20.dp)
             )
         }
-        Text(text = "Nuevo entranamiento")
+        Text(text = "Nuevo entrenamiento")
     }
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RellenarCampos(
     innerPadding: PaddingValues,
@@ -138,11 +115,11 @@ fun RellenarCampos(
     entrenamientoInput: String,
     onEntrenamientoChange: (String) -> Unit,
     viewModel: MainViewModel,
-    categoriaEntrenameintoInput: List<CategoriaEntrenamientos>,
-    onCategoriaChange: (List<CategoriaEntrenamientos>) -> Unit,
+    mensajeError: String // Agrega mensajeError como parámetro
 ) {
     val dias = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
     val diasAbreviados = listOf("L", "M", "X", "J", "V", "S", "D")
+
     Column(
         modifier = Modifier
             .padding(innerPadding)
@@ -150,22 +127,69 @@ fun RellenarCampos(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedTextField(
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val focusManager = LocalFocusManager.current // Manejador del foco
+
+        TextField(
             value = nombreInput,
             onValueChange = onNombreChange,
             label = { Text(text = "Nombre") },
-            shape = RoundedCornerShape(30.dp)
+            modifier = Modifier
+                .width(100.dp),
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Black,
+                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = Color.Black
+            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), // Define la acción del teclado
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide() // Cierra el teclado
+                    focusManager.clearFocus() // Quita el foco del TextField (el cursor desaparece)
+                }
+            )
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            value = entrenamientoInput,
-            onValueChange = onEntrenamientoChange,
-            label = { Text(text = "Entrenamiento") },
-            shape = RoundedCornerShape(30.dp)
-        )
+        var expanded by remember { mutableStateOf(false) }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(onClick = { expanded = !expanded }) {
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    /**
+                     * CategoriaEntrenamientos.values().forEach { categoria ->
+                     *                         DropdownMenuItem(
+                     *                             text = { Text(categoria.name) },
+                     *                             onClick = {
+                     *                                 onCategoriaChange(categoria)
+                     *                                 expanded = false
+                     *                             }
+                     *                         )
+                     *                     }
+                     */
+
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -198,111 +222,48 @@ fun RellenarCampos(
                 }
             }
         }
-        //Text(
-        //text = "Día seleccionado: ${viewModel.dia}",
-        //fontSize = 16.sp,
-        //modifier = Modifier.padding(top = 16.dp),
-        //color = Color.White
-        //)
 
-        Text(text = "Elige tu categoría")
-        var expanded by remember { mutableStateOf(false) }
-        var categoriaEntrenameintoInput by remember {
-            mutableStateOf<List<CategoriaEntrenamientos>>(
-                emptyList()
+        // Mostrar el mensaje de error al final del Column
+        if (mensajeError.isNotEmpty()) {
+            Text(
+                text = mensajeError,
+                color = Color.Red,
+                modifier = Modifier.padding(8.dp),
+                fontSize = 12.sp
             )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Column {
-                IconButton(onClick = { expanded = !expanded }) {
-                    Text(text = "Gimnasio")
-
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Gimnasio") },
-                        onClick = {
-                            categoriaEntrenameintoInput = listOf(CategoriaEntrenamientos.GIMNASIO)
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Cardio") },
-                        onClick = {
-                            categoriaEntrenameintoInput = listOf(CategoriaEntrenamientos.CARDIO)
-                            expanded = false
-                        }
-                    )
-                    //HorizontalDivider()
-                    DropdownMenuItem(
-                        text = { Text("Fuerza") },
-                        onClick = {
-                            categoriaEntrenameintoInput = listOf(CategoriaEntrenamientos.FUERZA)
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Flexibilidad") },
-                        onClick = {
-                            categoriaEntrenameintoInput =
-                                listOf(CategoriaEntrenamientos.FLEXIBILIDAD)
-                            expanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Entrenamientos Mixtos") },
-                        onClick = {
-                            categoriaEntrenameintoInput =
-                                listOf(CategoriaEntrenamientos.ENTRENAMIENTOSMIXTOS)
-                            expanded = false
-                        }
-                    )
-
-                }
-            }
-
         }
     }
 }
-
 @Composable
 fun BotonGuardar(
     navController: NavController,
     viewModel: MainViewModel,
     nombreInput: String,
-    entrenamientoInput: String,
-    categoriaEntrenameintoInput: List<CategoriaEntrenamientos>
+    mensajeError: String, // Recibe el mensaje de error
+    onMensajeErrorChange: (String) -> Unit // Recibe una función para actualizar el mensaje de error
 ) {
     BottomAppBar {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 onClick = {
                     val diaInput = viewModel.dia
-                    if (nombreInput.isNotBlank() && diaInput.isNotBlank() && entrenamientoInput.isNotBlank()) {
-                        val nuevoEntrenamiento = Entrenamientos(
-                            id = 0,
-                            nombre = nombreInput,
-                            dia = diaInput,
-                            entrenamiento = entrenamientoInput,
-                            categoriaEntrenamientos = categoriaEntrenameintoInput
-
-                        )
-
-                        viewModel.entrenamientos = viewModel.entrenamientos + nuevoEntrenamiento
-                        navController.navigate("paginaPrincipal")
+                    if (nombreInput.isNotBlank() && diaInput.isNotBlank()) {
+                       // val nuevoEntrenamiento = CaracteristicasEntrenamientos(
+                            //id = 0,
+                            //nombre = nombreInput,
+                            //dia = diaInput,
+                            //categoriaEntrenamientos = listOf(categoriaEntrenameintoInput)
+                       // )
+                        //viewModel.entrenamientos = viewModel.entrenamientos + nuevoEntrenamiento
+                        //navController.navigate("paginaPrincipal")
+                    } else {
+                        // Actualiza el mensaje de error
+                        onMensajeErrorChange("Por favor, rellene todos los campos antes de guardar.")
                     }
                 },
                 modifier = Modifier

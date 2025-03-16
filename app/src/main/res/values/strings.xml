@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Mygym</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="email">email\n</string>
+    <string name="Registro">Registro</string>
 </resources>

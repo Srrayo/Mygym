@@ -1,6 +1,6 @@
 package com.example.mygym.model
 
-data class Entrenamientos (
-    val nombre: String,
-    val ejercicios: List<Ejercicio>
+data class CaracteristicasEntrenamientos (
+    val nombre: String = "",
+    val subcategorias: List<String> = emptyList()
 )
