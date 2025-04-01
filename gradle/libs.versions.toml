@@ -1,5 +1,10 @@
 [versions]
+activityComposeVersion = "1.3.0"
 agp = "8.6.1"
+androidxActivityCompose = "1.6.1"
+androidxComposeMaterialMaterial = "1.0.0"
+androidxUiToolingPreview = "1.4.0"
+compose = "2.4.0"
 firebaseBom = "33.10.0"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
@@ -12,16 +17,34 @@ composeBom = "2025.02.00"
 foundationAndroid = "1.7.8"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.2.0"
+lifecycleRuntimeKtxVersion = "2.6.0"
+materialVersion = "1.7.8"
+maxkeppelerCalendarVersion = "<version>"
 navigationCompose = "2.8.8"
 appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 protoliteWellKnownTypes = "18.0.0"
+uiToolingPreview = "1.7.8"
+uiToolingPreviewVersion = "1.0.0"
+places = "4.2.0"
 
 [libraries]
+androidx-activity-compose-v130 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+androidx-activity-compose-v161 = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
+androidx-compose-material-material-v100 = { module = "androidx.compose.material:material", version.ref = "androidxComposeMaterialMaterial" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-runtime-ktx-v260 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtxVersion" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-ui-tooling-preview-v100 = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreviewVersion" }
+androidx-ui-tooling-preview-v140 = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "androidxUiToolingPreview" }
+clock = { module = "com.maxkeppeler.sheets-compose-dialogs:clock", version.ref = "maxkeppelerCalendarVersion" }
+com-maxkeppeler-sheets-compose-dialogs-calendar = { module = "com.maxkeppeler.sheets-compose-dialogs:calendar", version.ref = "maxkeppelerCalendarVersion" }
+compose = { module = "com.kizitonwose.calendar:compose", version.ref = "compose" }
+core = { module = "com.maxkeppeler.sheets-compose-dialogs:core", version.ref = "maxkeppelerCalendarVersion" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -43,7 +66,11 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "androidxComposeMaterialMaterial" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
+ui = { module = "androidx.compose.ui:ui", version.ref = "androidxUiToolingPreview" }
+ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

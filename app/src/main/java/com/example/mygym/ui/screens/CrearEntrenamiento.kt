@@ -1,5 +1,5 @@
 package com.example.mygym.ui.screens
-
+//-- ↓ Imports ↓ -------------------------------------------------
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,16 +44,20 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.sp
 
+//-- ↑ Imports ↑ -------------------------------------------------
+
+
 
 @Composable
 fun CrearEntrenamiento(
     navController: NavController,
     viewModel: MainViewModel,
+    caracteristicas: CaracteristicasEntrenamientos
 ) {
     var nombreInput by remember { mutableStateOf(viewModel.nombre) }
     var diaInput by remember { mutableStateOf(viewModel.dia) }
     var entrenamientoInput by remember { mutableStateOf(viewModel.entrenamiento) }
-    var mensajeError by remember { mutableStateOf("") } // Estado para el mensaje de error
+    val mensajeError by remember { mutableStateOf("") } // Estado para el mensaje de error
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -63,6 +67,7 @@ fun CrearEntrenamiento(
         bottomBar = {
         },
     ) { innerPadding ->
+
         RellenarCampos(
             innerPadding = innerPadding,
             nombreInput = nombreInput,
@@ -72,8 +77,11 @@ fun CrearEntrenamiento(
             entrenamientoInput = entrenamientoInput,
             onEntrenamientoChange = { entrenamientoInput = it },
             viewModel = viewModel,
-            mensajeError = mensajeError // Pasa el mensaje de error
+            mensajeError = mensajeError,
+            caracteristicas =  caracteristicas// Pasa el mensaje de error
         )
+
+
     }
 }
 
@@ -115,7 +123,8 @@ fun RellenarCampos(
     entrenamientoInput: String,
     onEntrenamientoChange: (String) -> Unit,
     viewModel: MainViewModel,
-    mensajeError: String // Agrega mensajeError como parámetro
+    mensajeError: String,// Agrega mensajeError como parámetro
+    caracteristicas: CaracteristicasEntrenamientos
 ) {
     val dias = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
     val diasAbreviados = listOf("L", "M", "X", "J", "V", "S", "D")
@@ -232,6 +241,8 @@ fun RellenarCampos(
                 fontSize = 12.sp
             )
         }
+
+       // EntrenamientosCard(caracteristicas, navController)
     }
 }
 @Composable

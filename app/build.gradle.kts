@@ -47,7 +47,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1" // La versión del plugin de Compose
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
 
     packaging {
@@ -60,6 +60,15 @@ android {
 dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation (libs.ui)
+//    implementation (libs.material3)
+    implementation (libs.androidx.ui.tooling.preview.v140)
+    implementation (libs.androidx.lifecycle.runtime.ktx.v260)
+    implementation (libs.androidx.lifecycle.viewmodel.compose)
+    implementation (libs.androidx.activity.compose.v161)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -68,13 +77,14 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.foundation.android)
+//    implementation(libs.androidx.foundation.android)
     implementation(libs.firebase.auth)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.protolite.well.known.types)
+//    implementation(libs.protolite.well.known.types)
+//    implementation(libs.places)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

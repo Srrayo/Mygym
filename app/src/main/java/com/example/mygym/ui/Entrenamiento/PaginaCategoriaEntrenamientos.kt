@@ -1,163 +1,221 @@
 package com.example.mygym.ui.Entrenamiento
+//-- ↓ Imports ↓ -------------------------------------------------
 
 import CaracteristicasEntrenamientoViewModel
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mygym.model.CaracteristicasEntrenamientos
+import androidx.compose.material3.Text
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
+import com.example.mygym.ui.screens.CerrarVentana
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+
+
+//-- ↑ Imports ↑ -------------------------------------------------
 
 @Composable
 fun PaginaCategoriaEntrenamientos(
     viewModelCategoria: CaracteristicasEntrenamientoViewModel,
-    navController: NavController
+    navController: NavController,
+    userId: String
 ) {
-    val caracteristicasEntrenamientos: State<List<CaracteristicasEntrenamientos>> =
-        viewModelCategoria.entrenamiento.collectAsState()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        RutinasGuardadasScreen(viewModelCategoria)
-        LazyColumn {
-            items(caracteristicasEntrenamientos.value) { entrenamiento ->
-                EntrenamientosCard(entrenamiento)
+    val caracteristicasEntrenamientos by viewModelCategoria.entrenamiento.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var mostrarLista by remember { mutableStateOf(false) }
+    var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
+    var subcategoriaSeleccionada by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(userId) {
+        if (userId.isNotEmpty()) {
+            viewModelCategoria.getEntrenamiento(userId)
+        }
+    }
+
+    Scaffold { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .padding(paddingValues),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CerrarVentana(navController)
+
+                Button(
+                    onClick = { mostrarLista = !mostrarLista },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Gray,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(text = "Categorías")
+                }
+
+                Text(
+                    text = "Categoría: ${categoriaSeleccionada ?: "No seleccionada"}\nSubcategoría: ${subcategoriaSeleccionada ?: "No seleccionada"}",
+                    color = Color.White,
+                    modifier = Modifier.padding(10.dp)
+                )
+
+                if (caracteristicasEntrenamientos.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center)
+                    ) {
+//                        CircularProgressIndicator()
+                    }
+                } else if (mostrarLista) {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f) // Hace que la lista ocupe el espacio disponible
+                    ) {
+                        items(caracteristicasEntrenamientos) { entrenamiento ->
+                            EntrenamientosCardExpandible(
+                                caracteristicas = entrenamiento,
+                                onSeleccionar = { categoria, subcategoria ->
+                                    categoriaSeleccionada = categoria
+                                    subcategoriaSeleccionada = subcategoria
+                                }
+                            )
+                        }
+                    }
+                }
+
+                RutinasGuardadasScreen(viewModelCategoria)
+            }
+
+            // Botón en la parte inferior centrado
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 16.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Button(
+                    onClick = {
+                        navController.navigate("paginaPrincipal")
+                        if (categoriaSeleccionada != null && subcategoriaSeleccionada != null) {
+                            viewModelCategoria.guardarRutinaEnFirestore(
+                                userId, categoriaSeleccionada!!, subcategoriaSeleccionada!!
+                            )
+                            Toast.makeText(context, "Entrenamiento guardado correctamente", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Tienes que rellenar todos los campos", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
+                    modifier = Modifier
+                        .width(180.dp)
+                        .height(45.dp)
+                ) {
+                    Text(text = "Guardar", color = Color.White)
+                }
             }
         }
     }
 }
 
+
+
 @Composable
-fun EntrenamientosCard(caracteristicas: CaracteristicasEntrenamientos) {
+fun EntrenamientosCardExpandible(
+    caracteristicas: CaracteristicasEntrenamientos,
+    onSeleccionar: (String, String) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp),
-        elevation = CardDefaults.cardElevation(5.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Black)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
+                .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Button(onClick = { expanded = !expanded }) {
-                Text(text = caracteristicas.nombre, color = Color.White)
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+            Button(
+                onClick = { expanded = !expanded },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
             ) {
-                caracteristicas.subcategorias.forEach { subcategoria ->
-                    androidx.compose.material3.DropdownMenuItem(
-                        text = { Text(text = subcategoria, color = Color.Black) },
-                        onClick = { expanded = false }
-                    )
+                Text(
+                    text = caracteristicas.nombre ?: "Nombre desconocido",
+                    color = Color.White
+                )
+            }
 
+            if (expanded) {
+                caracteristicas.subcategorias?.forEach { subcategoria ->
+                    Text(
+                        text = "$subcategoria",
+                        color = Color.LightGray,
+                        modifier = Modifier
+                            .clickable {
+                                onSeleccionar(caracteristicas.nombre ?: "Desconocido", subcategoria)
+                            }
+                            .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
+                    )
                 }
             }
-
         }
     }
 }
 
-@Composable
-fun EntrenamientosItem(caracteristicas: CaracteristicasEntrenamientos) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = caracteristicas.nombre.orEmpty(), color = Color.White)
-        Text(text = caracteristicas.subcategorias.joinToString(", "), color = Color.White)
-    }
-}
 
-@Composable
-fun CerrarVentana(
-    navController: NavController
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(30.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Button(
-            onClick = { navController.navigate("paginaCrearEntrenamiento") },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.Red
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = "volver",
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        Text(text = "Nuevo entrenamiento")
-    }
-}
 
 @Composable
 fun RutinasGuardadasScreen(viewModel: CaracteristicasEntrenamientoViewModel) {
-    // Obtener las rutinas guardadas del ViewModel
     val rutinasGuardadas by viewModel.rutinasGuardadas.collectAsState()
 
-    // Mostrar un indicador de carga si las rutinas están vacías
     if (rutinasGuardadas.isEmpty()) {
-        CircularProgressIndicator()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+        ) {
+//            CircularProgressIndicator()
+        }
     } else {
         LazyColumn {
             items(rutinasGuardadas) { rutina ->
                 Text("Nombre de la rutina: ${rutina.nombre}")
-                // Agregar otros campos de la clase CaracteristicasEntrenamientos aquí
             }
         }
     }
 }
 
-
-/**
- * fun createEntrenamientos(db: FirebaseFirestore) {
- *     val entrenamiento = Entrenamiento("GYM")
- *     db.collection("Categorias")
- *         .add(entrenamiento)
- *         .addOnSuccessListener { Log.i("Entrenamiento", "SUCCESS") }
- *         .addOnCompleteListener { Log.i("Entrenamiento", "COMPLETE") }
- *         .addOnFailureListener { Log.i("Entrenamiento", "FAILURE") }
- */
