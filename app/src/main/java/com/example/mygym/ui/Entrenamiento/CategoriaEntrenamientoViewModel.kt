@@ -15,14 +15,45 @@ import kotlinx.coroutines.tasks.await
 class CaracteristicasEntrenamientoViewModel : ViewModel() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
+    /**
+     * Este es un MutableStateFlow que alamcena una lista de objetos en este caso CaracteristicasEntrenamietos
+     * -MutableStateFlow: Es un flujo en kotlin que mantiene un estado actual y emite actualizaciones cada vez que el
+     * valor cambia.
+     * En este caso se inizializa con emptyList, lo que significa que al inicio la lista está vacía.
+     *
+     * -_entrenamiento: Es una variable privada, lo que significa que solo se puede cambiar o modificar dentro del ViewModel
+     *
+     * <List<CaracteristicasEntrenamientos>>: Lista de objetos de la clase CaracteristicasEntrenamientos
+     */
     private val _entrenamiento = MutableStateFlow<List<CaracteristicasEntrenamientos>>(emptyList())
     val entrenamiento: StateFlow<List<CaracteristicasEntrenamientos>> = _entrenamiento
 
+    /**
+     * Exponemos un StateFlow de solo lectura, para que otras partes del codigo como la UI puedan observarlo, pero sin poder
+     * modificarlo directamente.
+     */
     private val _rutinasGuardadas = MutableStateFlow<List<CaracteristicasEntrenamientos>>(emptyList())
     val rutinasGuardadas: StateFlow<List<CaracteristicasEntrenamientos>> = _rutinasGuardadas
 
+    /**
+     * Este es una variable que obtiene el ID del usuario autenticado actualmente en la aplicación.
+     *
+     * FirebaseAuth.getInstance(): Obtiene la instancia de Firebase Authentication. Esto te permite interactuar con el sistema de
+     * autenticación de Firebase.
+     *
+     * currentUser: Esta propiedad da acceso al usuario actualmente autenticado, si el usuario no ha iniciado sesión este valor será de null
+     *
+     * ?.uid: ?. -> es un operador seguro de llamada, lo que significa que solo intentará acceder al uid si currentUSer no es null
+     */
     private val userId: String? = FirebaseAuth.getInstance().currentUser?.uid
 
+    /**
+     * init: Es un bloque de codigo de inicialización en kotlin, que se ejecuta automáticamente cuando se crea una instancia del ViewModel.
+     * Este sirve para poner cualquier codigo que quieras ejecutar justo después de que el viewModel haya sido creado.
+     *
+     * let{...} -> Es un bloque de codigo que se ejecuta si userId no es null. Es una forma segura de trabajar con valores opecionales. Dentro
+     * del bloque let, el valor de userId se pasa como argumento en este caso el it.
+     */
     init {
         userId?.let {
             getEntrenamiento(it)
@@ -30,11 +61,16 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
+    /**
+     * userSnapshot: Es el resultado de una consulta a Firestore para obtener un documento de la base de datos. En este caso,
+     * userSnapshot es un objeto que representa el documento del usuario que estamos recuperando de Firestore.
+     */
     fun getEntrenamiento(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val entrenamientos = getEntrenamientosUsuario(userId)
                 _entrenamiento.value = entrenamientos
+                Log.d("FirestoreDebug", "Entrenamientos obtenidos: $entrenamientos")  // Log de depuración
             } catch (e: Exception) {
                 Log.e("FirestoreDebug", "Error en getEntrenamiento: ${e.message}")
             }
@@ -46,9 +82,14 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
             val categoriasRef = db.collection("usuarios").document(userId)
             val userSnapshot = categoriasRef.get().await()
 
-            if (!userSnapshot.exists()) return emptyList()
+            if (!userSnapshot.exists()) {
+                Log.d("FirestoreDebug", "No se encontró el documento del usuario.")
+                return emptyList()
+            }
 
             val categorias = userSnapshot.get("categorias") as? Map<String, List<String>> ?: emptyMap()
+            Log.d("FirestoreDebug", "Categorías obtenidas: $categorias")  // Log para verificar qué categorías se obtienen
+
             categorias.map { (categoria, subcategorias) ->
                 CaracteristicasEntrenamientos(categoria, subcategorias)
             }
@@ -70,13 +111,10 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                     "fecha_creacion" to FieldValue.serverTimestamp()
                 )
 
-                // Primero obtenemos el documento para verificar si "rutinasGuardadas" existe
                 userDocRef.get().addOnSuccessListener { document ->
                     if (document.exists() && document.contains("rutinasGuardadas")) {
-                        // Si existe, actualizamos el campo rutinasGuardadas
                         userDocRef.update("rutinasGuardadas", FieldValue.arrayUnion(rutina))
                             .addOnSuccessListener {
-                                // También agregamos la fecha de creación en otro campo
                                 userDocRef.update("fechaCreacion", FieldValue.serverTimestamp())
                                     .addOnSuccessListener {
                                         Log.d("FirestoreDebug", "Fecha de creación guardada correctamente.")
@@ -89,7 +127,6 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                                 Log.e("FirestoreDebug", "Error al guardar rutina: ${e.message}")
                             }
                     } else {
-                        // Si no existe, creamos el campo rutinasGuardadas y fecha_creacion
                         userDocRef.set(
                             mapOf(
                                 "rutinasGuardadas" to listOf(rutina),
@@ -108,8 +145,6 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
-
-
     fun getRutinasGuardadas(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -127,6 +162,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                 }
 
                 _rutinasGuardadas.value = rutinas
+                Log.d("FirestoreDebug", "Rutinas guardadas obtenidas: $rutinas")  // Log de depuración
             } catch (e: Exception) {
                 Log.e("FirestoreDebug", "Error al obtener rutinas guardadas: ${e.message}")
             }
