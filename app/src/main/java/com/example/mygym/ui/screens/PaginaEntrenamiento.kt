@@ -108,11 +108,11 @@ fun CrearNuevoEntreanmiento(navController: NavController, viewModel: MainViewMod
             }
 
         }
-        Calendario(
-            onDateSelected = { date ->
-                selectedDate = date
-            }
-        )
+//        Calendario(
+//            onDateSelected = { date ->
+//                selectedDate = date
+//            }
+//        )
 //        LazyEntrenamiento2(entrenamientos = entrenamientos, navController)
 
     }

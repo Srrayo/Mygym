@@ -85,32 +85,7 @@ fun CrearEntrenamiento(
     }
 }
 
-@Composable
-fun CerrarVentana(
-    navController: NavController
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(30.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Button(
-            onClick = { navController.navigate("paginaCrearEntrenamiento") },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.Red
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = "volver",
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        Text(text = "Nuevo entrenamiento")
-    }
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

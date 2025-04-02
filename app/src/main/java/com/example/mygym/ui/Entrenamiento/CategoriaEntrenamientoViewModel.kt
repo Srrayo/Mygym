@@ -70,7 +70,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
             try {
                 val entrenamientos = getEntrenamientosUsuario(userId)
                 _entrenamiento.value = entrenamientos
-                Log.d("FirestoreDebug", "Entrenamientos obtenidos: $entrenamientos")  // Log de depuración
+                Log.d("FirestoreDebug", "Entrenamientos obtenidos: $entrenamientos")
             } catch (e: Exception) {
                 Log.e("FirestoreDebug", "Error en getEntrenamiento: ${e.message}")
             }
@@ -88,10 +88,10 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
             }
 
             val categorias = userSnapshot.get("categorias") as? Map<String, List<String>> ?: emptyMap()
-            Log.d("FirestoreDebug", "Categorías obtenidas: $categorias")  // Log para verificar qué categorías se obtienen
+            Log.d("FirestoreDebug", "Categorías obtenidas: $categorias")
 
             categorias.map { (categoria, subcategorias) ->
-                CaracteristicasEntrenamientos(categoria, subcategorias)
+                CaracteristicasEntrenamientos(categoria, subcategorias, "")
             }
         } catch (e: Exception) {
             Log.e("FirestoreDebug", "Error al obtener entrenamientos: ${e.message}")
@@ -99,45 +99,33 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
-    fun guardarRutinaEnFirestore(userId: String, categoria: String, subcategoria: String) {
+    fun guardarRutinaEnFirestore(userId: String, categoria: String, subcategoria: String, nombreEntrenamiento: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userDocRef = db.collection("usuarios").document(userId)
                 val rutina = mapOf(
+                    "nombreEntrenamiento" to nombreEntrenamiento,
                     "categoria" to categoria,
                     "subcategoria" to subcategoria
                 )
-                val fechaCreacion = mapOf(
-                    "fecha_creacion" to FieldValue.serverTimestamp()
-                )
 
-                userDocRef.get().addOnSuccessListener { document ->
-                    if (document.exists() && document.contains("rutinasGuardadas")) {
-                        userDocRef.update("rutinasGuardadas", FieldValue.arrayUnion(rutina))
-                            .addOnSuccessListener {
-                                userDocRef.update("fechaCreacion", FieldValue.serverTimestamp())
-                                    .addOnSuccessListener {
-                                        Log.d("FirestoreDebug", "Fecha de creación guardada correctamente.")
-                                    }
-                                    .addOnFailureListener { e ->
-                                        Log.e("FirestoreDebug", "Error al guardar fecha de creación: ${e.message}")
-                                    }
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("FirestoreDebug", "Error al guardar rutina: ${e.message}")
-                            }
-                    } else {
-                        userDocRef.set(
-                            mapOf(
-                                "rutinasGuardadas" to listOf(rutina),
-                                "fecha_creacion" to FieldValue.serverTimestamp()
-                            ), SetOptions.merge()
-                        ).addOnSuccessListener {
-                            Log.d("FirestoreDebug", "Rutina y fecha guardada correctamente.")
-                        }.addOnFailureListener { e ->
-                            Log.e("FirestoreDebug", "Error al crear rutinasGuardadas y fecha: ${e.message}")
-                        }
-                    }
+                Log.d("FirestoreDebug", "Guardando rutina: $rutina")
+
+                val documentSnapshot = userDocRef.get().await()
+
+                if (documentSnapshot.exists() && documentSnapshot.contains("rutinasGuardadas")) {
+                    userDocRef.update("rutinasGuardadas", FieldValue.arrayUnion(rutina)).await()
+                    userDocRef.update("fechaCreacion", FieldValue.serverTimestamp()).await()
+                    Log.d("FirestoreDebug", "Rutina y fecha actualizadas correctamente.")
+                } else {
+                    userDocRef.set(
+                        mapOf(
+                            "rutinasGuardadas" to listOf(rutina),
+                            "fecha_creacion" to FieldValue.serverTimestamp()
+                        ),
+                        SetOptions.merge()
+                    ).await()
+                    Log.d("FirestoreDebug", "Rutina y fecha guardadas correctamente.")
                 }
             } catch (e: Exception) {
                 Log.e("FirestoreDebug", "Error en guardarRutinaEnFirestore: ${e.message}")
@@ -154,15 +142,16 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                 val rutinas = rutinasGuardadas.mapNotNull { rutina ->
                     val categoria = rutina["categoria"] as? String
                     val subcategoria = rutina["subcategoria"] as? String
-                    if (categoria != null && subcategoria != null) {
-                        CaracteristicasEntrenamientos(categoria, listOf(subcategoria))
+                    val nombre = rutina["nombreEntrenamiento"] as? String
+                    if (categoria != null && subcategoria != null && nombre != null) {
+                        CaracteristicasEntrenamientos(categoria, listOf(subcategoria), nombre)
                     } else {
                         null
                     }
                 }
 
                 _rutinasGuardadas.value = rutinas
-                Log.d("FirestoreDebug", "Rutinas guardadas obtenidas: $rutinas")  // Log de depuración
+                Log.d("FirestoreDebug", "Rutinas guardadas obtenidas: $rutinas")
             } catch (e: Exception) {
                 Log.e("FirestoreDebug", "Error al obtener rutinas guardadas: ${e.message}")
             }

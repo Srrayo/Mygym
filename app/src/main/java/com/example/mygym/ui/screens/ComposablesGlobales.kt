@@ -75,6 +75,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.Surface
@@ -527,6 +528,33 @@ private fun getDaysInMonth(year: Int, month: Int): List<Int> {
         daysInMonth.add(day)
     }
     return daysInMonth
+}
+
+@Composable
+fun CerrarVentana(
+    navController: NavController
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Button(
+            onClick = { navController.navigate("paginaCrearEntrenamiento") },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Red
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Close,
+                contentDescription = "volver",
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Text(text = "Nuevo entrenamiento", color = Color.Black, modifier = Modifier.padding(bottom = 15.dp))
+    }
 }
 
 // Convertir un día, mes y año a milisegundos
