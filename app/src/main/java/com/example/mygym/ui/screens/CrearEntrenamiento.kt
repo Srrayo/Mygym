@@ -14,12 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,10 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.mygym.model.CaracteristicasEntrenamientos
+import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.example.mygym.model.MainViewModel
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.platform.LocalFocusManager
@@ -52,7 +48,7 @@ import androidx.compose.ui.unit.sp
 fun CrearEntrenamiento(
     navController: NavController,
     viewModel: MainViewModel,
-    caracteristicas: CaracteristicasEntrenamientos
+    caracteristicas: DataClassCaracteristicasEntrenamientos
 ) {
     var nombreInput by remember { mutableStateOf(viewModel.nombre) }
     var diaInput by remember { mutableStateOf(viewModel.dia) }
@@ -98,8 +94,8 @@ fun RellenarCampos(
     entrenamientoInput: String,
     onEntrenamientoChange: (String) -> Unit,
     viewModel: MainViewModel,
-    mensajeError: String,// Agrega mensajeError como parámetro
-    caracteristicas: CaracteristicasEntrenamientos
+    mensajeError: String,
+    caracteristicas: DataClassCaracteristicasEntrenamientos
 ) {
     val dias = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
     val diasAbreviados = listOf("L", "M", "X", "J", "V", "S", "D")

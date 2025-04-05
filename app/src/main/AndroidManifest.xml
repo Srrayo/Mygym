@@ -15,30 +15,74 @@
         android:theme="@style/Theme.Mygym"
         tools:targetApi="31">
 
-        <!-- Actividad de registro -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
 
-        <!-- Actividad de inicio de sesión (cambia a ser la principal) -->
         <activity
             android:name=".LoginActivity"
-            android:exported="true"/>
-
-            <activity
-                android:name=".MainActivity"
-                android:exported="true"
-                android:label="@string/app_name"
-                android:theme="@style/Theme.Mygym" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- MAIN ACTIVITY -->
-
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Mygym">
+        </activity>
 
     </application>
 
 </manifest>
+
+
+
+
+<!--    <?xml version="1.0" encoding="utf-8"?>-->
+<!--<manifest xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--xmlns:tools="http://schemas.android.com/tools">-->
+
+<!--<uses-permission android:name="android.permission.INTERNET" />-->
+
+<!--<application-->
+<!--    android:allowBackup="true"-->
+<!--    android:dataExtractionRules="@xml/data_extraction_rules"-->
+<!--    android:fullBackupContent="@xml/backup_rules"-->
+<!--    android:icon="@drawable/logonegro"-->
+<!--    android:label="@string/app_name"-->
+<!--    android:roundIcon="@drawable/logonegro"-->
+<!--    android:supportsRtl="true"-->
+<!--    android:theme="@style/Theme.Mygym"-->
+<!--    tools:targetApi="31">-->
+
+<!--    &lt;!&ndash; Actividad de registro &ndash;&gt;-->
+<!--    <activity-->
+<!--        android:name=".RegisterActivity"-->
+<!--        android:exported="false" />-->
+
+<!--    &lt;!&ndash; Actividad de inicio de sesión (cambia a ser la principal) &ndash;&gt;-->
+<!--    <activity-->
+<!--        android:name=".LoginActivity"-->
+<!--        android:exported="true"/>-->
+
+<!--    <activity-->
+<!--        android:name=".MainActivity"-->
+<!--        android:exported="true"-->
+<!--        android:label="@string/app_name"-->
+<!--        android:theme="@style/Theme.Mygym" >-->
+<!--        <intent-filter>-->
+<!--            <action android:name="android.intent.action.MAIN" />-->
+<!--            <category android:name="android.intent.category.LAUNCHER" />-->
+<!--        </intent-filter>-->
+<!--    </activity>-->
+
+<!--    &lt;!&ndash; MAIN ACTIVITY &ndash;&gt;-->
+
+
+<!--</application>-->
+
+<!--</manifest>-->

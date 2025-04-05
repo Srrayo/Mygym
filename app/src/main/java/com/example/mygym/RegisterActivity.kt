@@ -232,9 +232,6 @@
 //}
 
 
-
-
-
 package com.example.mygym
 
 import android.content.Intent
@@ -287,7 +284,13 @@ class RegisterActivity : ComponentActivity() {
     }
 }
 
-fun registrarUsuario(email: String, password: String, auth: FirebaseAuth, onSuccess: () -> Unit, onError: (String) -> Unit) {
+fun registrarUsuario(
+    email: String,
+    password: String,
+    auth: FirebaseAuth,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
     auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -297,10 +300,27 @@ fun registrarUsuario(email: String, password: String, auth: FirebaseAuth, onSucc
 
                 // Datos iniciales para el usuario en Firestore
                 val datosIniciales = hashMapOf(
+                    "nombre" to "",
+                    "apellidos" to "",
+                    "edad" to "",
+                    "peso" to "",
+                    "altura" to "",
+                    "fechaNacimiento" to "",
                     "categorias" to hashMapOf(
-                        "Gimnasio" to listOf("Pecho", "Pierna", "Espalda", "Brazo", "Abdomen", "Hombro"),
+                        "Gimnasio" to listOf(
+                            "Pecho",
+                            "Pierna",
+                            "Espalda",
+                            "Brazo",
+                            "Abdomen",
+                            "Hombro"
+                        ),
                         "Cardio" to listOf("Cinta", "Elíptica", "Bicicleta", "Saltos"),
-                        "Flexibilidad" to listOf("Yoga", "Estiramientos dinámicos", "Estiramientos estáticos"),
+                        "Flexibilidad" to listOf(
+                            "Yoga",
+                            "Estiramientos dinámicos",
+                            "Estiramientos estáticos"
+                        ),
                         "Fuerza" to listOf("Peso libre", "Máquinas", "Calistenia")
                     ),
                     "seleccionados" to listOf<String>()
@@ -422,27 +442,44 @@ fun RegisterScreen(auth: FirebaseAuth, onRegisterSuccess: () -> Unit) {
                         onClick = {
                             if (email.isNotEmpty() && password.isNotEmpty()) {
                                 if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                                    Toast.makeText(context, "Ingrese un correo válido", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Ingrese un correo válido",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 }
                                 if (password.length < 6) {
-                                    Toast.makeText(context, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "La contraseña debe tener al menos 6 caracteres",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 }
                                 isLoading = true
                                 registrarUsuario(email, password, auth,
                                     onSuccess = {
                                         isLoading = false
-                                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Registro exitoso",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                         onRegisterSuccess()
                                     },
                                     onError = { error ->
                                         isLoading = false
-                                        Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT)
+                                            .show()
                                     }
                                 )
                             } else {
-                                Toast.makeText(context, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Por favor, complete todos los campos",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         },
                     ) {

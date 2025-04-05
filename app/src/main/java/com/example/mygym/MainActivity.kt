@@ -12,20 +12,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mygym.model.CalendarViewModel
-import com.example.mygym.model.CaracteristicasEntrenamientos
 import com.example.mygym.model.MainViewModel
-import com.example.mygym.ui.screens.CrearEntrenamiento
 import com.example.mygym.ui.screens.EdicionEntrenamiento
 import com.example.mygym.ui.screens.PaginaCalendario
 import com.example.mygym.ui.Entrenamiento.PaginaCategoriaEntrenamientos
+import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
+import com.example.mygym.ui.PerfilUsuario.PaginaDataUser
 import com.example.mygym.ui.screens.PaginaEntrenamiento
 import com.example.mygym.ui.screens.PaginaPrincipal
+import com.example.mygym.ui.screens.TabRowPantallas
 import com.example.mygym.ui.theme.MygymTheme
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
     private val categoriaEntrenamientoViewModel: CaracteristicasEntrenamientoViewModel by viewModels()
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,30 +36,67 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val calendarViewModel: CalendarViewModel = viewModel()
                 val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                val dataUserViewModel: DataUserViewModel = viewModel()
                 NavHost(
                     navController = navController,
-                    startDestination = "paginaPrincipal",
+                    startDestination = "tabRowPantallas",
                     builder = {
                         composable("paginaPrincipal") {
-                            PaginaPrincipal(navController = navController, viewModel = mainViewModel, viewModelCaracteristicas = CaracteristicasEntrenamientoViewModel())
+                            PaginaPrincipal(
+                                navController = navController,
+                                viewModel = mainViewModel,
+                                viewModelCaracteristicas = CaracteristicasEntrenamientoViewModel(),
+                                dataUserViewModel = dataUserViewModel,
+                                calendarViewModel = CalendarViewModel()
+                            )
                         }
                         composable("paginaCrearEntrenamiento") {
-                            PaginaEntrenamiento(navController = navController, viewModel = mainViewModel, calendarViewModel = CalendarViewModel())
+                            PaginaEntrenamiento(
+                                navController = navController,
+                                viewModel = mainViewModel,
+                                calendarViewModel = CalendarViewModel(),
+                                viewModelCaracteristicas = CaracteristicasEntrenamientoViewModel(),
+                                dataUserViewModel = dataUserViewModel
+                            )
                         }
                         composable("paginaCalendario") {
-                            PaginaCalendario(navController = navController, viewModel = mainViewModel, calendarViewModel = CalendarViewModel())
+                            PaginaCalendario(
+                                navController = navController,
+                                viewModel = mainViewModel,
+                                calendarViewModel = CalendarViewModel(),
+                                dataUserViewModel = dataUserViewModel,
+                                viewModelCaracteristicas = categoriaEntrenamientoViewModel
+                            )
                         }
-//                        composable("crearEntrenamiento") {
-//                            CrearEntrenamiento(navController = navController, viewModel = mainViewModel, caracteristicas = CaracteristicasEntrenamientos())
-//                        }
-                        composable("edicionEntrenamiento"){
-                            EdicionEntrenamiento(navController = navController, viewModel = mainViewModel)
+                        composable("edicionEntrenamiento") {
+                            EdicionEntrenamiento(
+                                navController = navController,
+                                viewModel = mainViewModel
+                            )
                         }
-                        composable("categoriaEntrenamientos"){
+                        composable("categoriaEntrenamientos") {
                             PaginaCategoriaEntrenamientos(
                                 navController = navController,
                                 viewModelCategoria = categoriaEntrenamientoViewModel,
-                                userId = userId)
+                                userId = userId
+                            )
+                        }
+
+                        composable("paginaDataUser") {
+                            PaginaDataUser(
+                                navController = navController,
+                                dataUserViewModel = dataUserViewModel
+                            )
+                        }
+
+                        composable("tabRowPantallas"){
+                            TabRowPantallas(
+                                navController = navController,
+                                dataUserViewModel = dataUserViewModel,
+                                calendarViewModel = CalendarViewModel(),
+                                viewModelCaracteristicas = categoriaEntrenamientoViewModel,
+                                viewModel = mainViewModel
+                            )
                         }
                     })
             }

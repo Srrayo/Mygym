@@ -1,6 +1,6 @@
 package com.example.mygym.model
 
-data class CaracteristicasEntrenamientos(
+data class DataClassCaracteristicasEntrenamientos(
     val nombre: String?,
     val subcategorias: List<String>?,
     val nombreEntrenamiento: String?

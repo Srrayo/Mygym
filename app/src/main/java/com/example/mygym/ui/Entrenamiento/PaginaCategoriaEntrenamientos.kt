@@ -3,10 +3,8 @@ package com.example.mygym.ui.Entrenamiento
 //-- ↓ Imports ↓ -------------------------------------------------
 
 import CaracteristicasEntrenamientoViewModel
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,7 +23,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.mygym.model.CaracteristicasEntrenamientos
+import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.example.mygym.ui.screens.CerrarVentana
 
 //-- ↑ Imports ↑ -------------------------------------------------
@@ -71,7 +69,7 @@ fun PaginaCategoriaEntrenamientos(
                                 "Entrenamiento guardado correctamente",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            navController.navigate("paginaPrincipal")
+                            navController.navigate("tabRowPantallas")
                         } else {
                             Toast.makeText(
                                 context,
@@ -161,7 +159,7 @@ fun PaginaCategoriaEntrenamientos(
 
 @Composable
 fun EntrenamientosCardExpandible(
-    caracteristicas: CaracteristicasEntrenamientos,
+    caracteristicas: DataClassCaracteristicasEntrenamientos,
     onSeleccionar: (String, String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }

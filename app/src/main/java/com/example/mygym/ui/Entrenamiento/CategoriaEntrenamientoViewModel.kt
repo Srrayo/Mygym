@@ -1,7 +1,7 @@
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mygym.model.CaracteristicasEntrenamientos
+import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,15 +25,15 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
      *
      * <List<CaracteristicasEntrenamientos>>: Lista de objetos de la clase CaracteristicasEntrenamientos
      */
-    private val _entrenamiento = MutableStateFlow<List<CaracteristicasEntrenamientos>>(emptyList())
-    val entrenamiento: StateFlow<List<CaracteristicasEntrenamientos>> = _entrenamiento
+    private val _entrenamiento = MutableStateFlow<List<DataClassCaracteristicasEntrenamientos>>(emptyList())
+    val entrenamiento: StateFlow<List<DataClassCaracteristicasEntrenamientos>> = _entrenamiento
 
     /**
      * Exponemos un StateFlow de solo lectura, para que otras partes del codigo como la UI puedan observarlo, pero sin poder
      * modificarlo directamente.
      */
-    private val _rutinasGuardadas = MutableStateFlow<List<CaracteristicasEntrenamientos>>(emptyList())
-    val rutinasGuardadas: StateFlow<List<CaracteristicasEntrenamientos>> = _rutinasGuardadas
+    private val _rutinasGuardadas = MutableStateFlow<List<DataClassCaracteristicasEntrenamientos>>(emptyList())
+    val rutinasGuardadas: StateFlow<List<DataClassCaracteristicasEntrenamientos>> = _rutinasGuardadas
 
     /**
      * Este es una variable que obtiene el ID del usuario autenticado actualmente en la aplicación.
@@ -77,7 +77,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
-    private suspend fun getEntrenamientosUsuario(userId: String): List<CaracteristicasEntrenamientos> {
+    private suspend fun getEntrenamientosUsuario(userId: String): List<DataClassCaracteristicasEntrenamientos> {
         return try {
             val categoriasRef = db.collection("usuarios").document(userId)
             val userSnapshot = categoriasRef.get().await()
@@ -91,7 +91,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
             Log.d("FirestoreDebug", "Categorías obtenidas: $categorias")
 
             categorias.map { (categoria, subcategorias) ->
-                CaracteristicasEntrenamientos(categoria, subcategorias, "")
+                DataClassCaracteristicasEntrenamientos(categoria, subcategorias, "")
             }
         } catch (e: Exception) {
             Log.e("FirestoreDebug", "Error al obtener entrenamientos: ${e.message}")
@@ -144,7 +144,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                     val subcategoria = rutina["subcategoria"] as? String
                     val nombre = rutina["nombreEntrenamiento"] as? String
                     if (categoria != null && subcategoria != null && nombre != null) {
-                        CaracteristicasEntrenamientos(categoria, listOf(subcategoria), nombre)
+                        DataClassCaracteristicasEntrenamientos(categoria, listOf(subcategoria), nombre)
                     } else {
                         null
                     }

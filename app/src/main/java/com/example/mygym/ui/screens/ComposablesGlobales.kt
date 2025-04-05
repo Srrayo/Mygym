@@ -1,11 +1,12 @@
 package com.example.mygym.ui.screens
 
-import android.annotation.SuppressLint
+import CaracteristicasEntrenamientoViewModel
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,44 +62,52 @@ import com.example.mygym.R
 import com.example.mygym.model.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mygym.model.CalendarViewModel
+import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 // -- ↓ Logo e info del usuario ↓ ---------------------------------------------------------------------------
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Header(navController: NavController, viewModel: MainViewModel) {
+fun HeaderPaginaPrincipal(
+    navController: NavController,
+    viewModel: MainViewModel,
+    viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
+    dataUserViewModel: DataUserViewModel,
+    calendarViewModel: CalendarViewModel
+) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val userId = user?.uid ?: return
+    var nombre by remember { mutableStateOf("") }
+    val usuario = dataUserViewModel.usuario
+    LaunchedEffect(userId) {
+        dataUserViewModel.loadUserData(userId)
+    }
+    LaunchedEffect(usuario) {
+        nombre = usuario.nombre
+    }
+
     Column(
         modifier = Modifier
-            .background(Color.Black),
+            .background(Color.Black)
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -117,7 +126,6 @@ fun Header(navController: NavController, viewModel: MainViewModel) {
             )
         }
         Spacer(modifier = Modifier.height(30.dp))
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -126,7 +134,7 @@ fun Header(navController: NavController, viewModel: MainViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Hola, " + viewModel.nombreUsuario,
+                text = "Hola, $nombre",
                 color = Color.White,
                 fontSize = 30.sp
             )
@@ -137,92 +145,151 @@ fun Header(navController: NavController, viewModel: MainViewModel) {
 }
 // -- ↑ Logo e info del usuario ↑ ---------------------------------------------------------------------------
 
-// -- ↓ Boton pagina principal ↓ ----------------------------------------------------------------------------
 @Composable
-fun Btn_PaginaPrincipal(navController: NavController) {
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-    Button(
-        onClick = { navController.navigate("paginaPrincipal") },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+fun HeaderPaginaEntrenamiento(
+    navController: NavController,
+    viewModel: MainViewModel,
+    viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
+    dataUserViewModel: DataUserViewModel,
+    calendarViewModel: CalendarViewModel
+) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val userId = user?.uid ?: return
+    var nombre by remember { mutableStateOf("") }
+    val usuario = dataUserViewModel.usuario
+    LaunchedEffect(userId) {
+        dataUserViewModel.loadUserData(userId)
+    }
+    LaunchedEffect(usuario) {
+        nombre = usuario.nombre
+    }
+
+    Column(
+        modifier = Modifier
+            .background(Color.Black)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Entrenamiento",
-            color = Color.Black,
-            fontSize = 12.sp,
-            style = if (currentRoute == "paginaPrincipal") {
-                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
-            } else {
-                TextStyle()
-            }
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.logob),
+                contentDescription = "logo",
+                modifier = Modifier
+                    .size(100.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(30.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Hola, $nombre",
+                color = Color.White,
+                fontSize = 30.sp
+            )
+            Text(text = "25", color = Color.White, fontSize = 30.sp)
+        }
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
+
+// -- ↓ Boton pagina principal ↓ ----------------------------------------------------------------------------
+//@Composable
+//fun Btn_PaginaPrincipal(navController: NavController) {
+//    val currentRoute = navController.currentBackStackEntry?.destination?.route
+//    Button(
+//        onClick = { navController.navigate("paginaPrincipal") },
+//        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+//    ) {
+//        Text(
+//            text = "Entrenamiento",
+//            color = Color.Black,
+//            fontSize = 12.sp,
+//            style = if (currentRoute == "paginaPrincipal") {
+//                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
+//            } else {
+//                TextStyle()
+//            }
+//        )
+//    }
+//}
 // -- ↑  Boton pagina principal ↑ ---------------------------------------------------------------------------
 
 // -- ↓ Boton pagina paginaCrearEntrenamiento ↓ -------------------------------------------------------------
-@Composable
-fun Btn_PaginaCrearEntrenamiento(navController: NavController) {
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-    Button(
-        onClick = { navController.navigate("paginaCrearEntrenamiento") },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Text(
-            text = "Crear",
-            color = Color.Black,
-            fontSize = 12.sp,
-            style = if (currentRoute == "paginaCrearEntrenamiento") {
-                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
-            } else {
-                TextStyle()
-            }
-        )
-    }
-}
+//@Composable
+//fun Btn_PaginaCrearEntrenamiento(navController: NavController) {
+//    val currentRoute = navController.currentBackStackEntry?.destination?.route
+//    Button(
+//        onClick = { navController.navigate("paginaCrearEntrenamiento") },
+//        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+//    ) {
+//        Text(
+//            text = "Crear",
+//            color = Color.Black,
+//            fontSize = 12.sp,
+//            style = if (currentRoute == "paginaCrearEntrenamiento") {
+//                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
+//            } else {
+//                TextStyle()
+//            }
+//        )
+//    }
+//}
 // -- ↑  Boton pagina paginaCrearEntrenamiento ↑ -------------------------------------------------------------
 
 // -- ↓ Boton pagina Calendario ↓ ----------------------------------------------------------------------------
-@Composable
-fun Btn_Calendario(navController: NavController) {
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-    Button(
-        onClick = { navController.navigate("paginaCalendario") },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Text(
-            text = "Calendario",
-            color = Color.Black,
-            fontSize = 12.sp,
-            style = if (currentRoute == "paginaCalendario") {
-                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
-            } else {
-                TextStyle()
-            }
-        )
-    }
-}
+//@Composable
+//fun Btn_Calendario(navController: NavController) {
+//    val currentRoute = navController.currentBackStackEntry?.destination?.route
+//    Button(
+//        onClick = { navController.navigate("paginaCalendario") },
+//        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+//    ) {
+//        Text(
+//            text = "Calendario",
+//            color = Color.Black,
+//            fontSize = 12.sp,
+//            style = if (currentRoute == "paginaCalendario") {
+//                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
+//            } else {
+//                TextStyle()
+//            }
+//        )
+//    }
+//}
 // -- ↑  Boton pagina Calendario ↑ ---------------------------------------------------------------------------
 
 // -- ↓ Boton pagina Categoria entrenamiendos ↓ --------------------------------------------------------------
-@Composable
-fun Btn_CategoriaEntrenamientos(navController: NavController) {
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-    Button(
-        onClick = { navController.navigate("categoriaEntrenamientos") },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-    ) {
-        Text(
-            text = "CategoriaEntrenamiento",
-            color = Color.Black,
-            fontSize = 12.sp,
-            style = if (currentRoute == "categoriaEntrenamientos") {
-                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
-            } else {
-                TextStyle()
-            }
-        )
-    }
-}
+//@Composable
+//fun Btn_CategoriaEntrenamientos(navController: NavController) {
+//    val currentRoute = navController.currentBackStackEntry?.destination?.route
+//    Button(
+//        onClick = { navController.navigate("categoriaEntrenamientos") },
+//        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+//    ) {
+//        Text(
+//            text = "CategoriaEntrenamiento",
+//            color = Color.Black,
+//            fontSize = 12.sp,
+//            style = if (currentRoute == "categoriaEntrenamientos") {
+//                TextStyle(textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold)
+//            } else {
+//                TextStyle()
+//            }
+//        )
+//    }
+//}
 // -- ↑  Boton pagina Categoria entrenamiendos ↑ ------------------------------------------------------------
 
 // -- ↓ Logout button ↓ -------------------------------------------------------------------------------------
@@ -264,7 +331,7 @@ fun MenuLateral(
 
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet(modifier = Modifier.background(Color.Gray)) {
+            ModalDrawerSheet(modifier = Modifier.background(Color.Transparent)) {
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -280,20 +347,16 @@ fun MenuLateral(
                     )
                     HorizontalDivider()
 
-                    Text(
-                        "Section 1",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleMedium
-                    )
                     NavigationDrawerItem(
-                        label = { Text("Item 1") },
+                        label = { Text("Perfil") },
                         selected = false,
-                        onClick = { /* Handle click */ }
+                        onClick = { navController.navigate("paginaDataUser") },
+                        icon = { Icon(Icons.Filled.Person, contentDescription = "Usuario") }
                     )
                     NavigationDrawerItem(
                         label = { Text("Item 2") },
                         selected = false,
-                        onClick = { /* Handle click */ }
+                        onClick = { }
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -307,7 +370,7 @@ fun MenuLateral(
                         label = { Text("Ajustes") },
                         selected = false,
                         icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                        onClick = { /* Handle click */ }
+                        onClick = { }
                     )
 
                     Spacer(Modifier.height(40.dp))
@@ -421,7 +484,14 @@ fun DatePickerDialog(
                         Text("Selecciona una fecha")
                     },
                     headline = {
-                        Text("Fecha seleccionada: ${datePickerState.selectedDateMillis?.let { formatDate(it) } ?: "Ninguna"}")
+                        Text(
+                            "Fecha seleccionada: ${
+                                datePickerState.selectedDateMillis?.let {
+                                    formatDate(
+                                        it
+                                    )
+                                } ?: "Ninguna"
+                            }")
                     },
                     showModeToggle = true
                 )
@@ -537,11 +607,11 @@ fun CerrarVentana(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White),
+            .background(Color.Transparent),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Button(
-            onClick = { navController.navigate("paginaCrearEntrenamiento") },
+            onClick = { navController.navigate("tabRowPantallas") },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = Color.Red
@@ -553,7 +623,6 @@ fun CerrarVentana(
                 modifier = Modifier.size(20.dp)
             )
         }
-        Text(text = "Nuevo entrenamiento", color = Color.Black, modifier = Modifier.padding(bottom = 15.dp))
     }
 }
 
@@ -568,8 +637,8 @@ private fun parseDate(dateString: String): Long? {
     return try {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val date = dateFormat.parse(dateString)
-        date?.time // Devuelve el tiempo en milisegundos
+        date?.time
     } catch (e: Exception) {
-        null // Si hay un error al parsear, devolvemos null
+        null
     }
 }

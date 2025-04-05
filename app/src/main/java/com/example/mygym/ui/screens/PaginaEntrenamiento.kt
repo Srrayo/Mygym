@@ -1,8 +1,14 @@
 package com.example.mygym.ui.screens
 
 import CaracteristicasEntrenamientoViewModel
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Create
@@ -22,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,98 +35,150 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mygym.model.CalendarViewModel
-import com.example.mygym.model.CaracteristicasEntrenamientos
+import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.example.mygym.model.MainViewModel
+import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PaginaEntrenamiento(navController: NavController, viewModel: MainViewModel, calendarViewModel: CalendarViewModel) {
-
+fun PaginaEntrenamiento(
+    navController: NavController,
+    viewModel: MainViewModel,
+    viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
+    dataUserViewModel: DataUserViewModel,
+    calendarViewModel: CalendarViewModel
+) {
+    val rutinasGuardadas by viewModelCaracteristicas.rutinasGuardadas.collectAsState()
+    var mostrarMensaje by remember { mutableStateOf(false) }
+    LaunchedEffect(rutinasGuardadas) {
+        kotlinx.coroutines.delay(3000)
+        if (rutinasGuardadas.isEmpty()) {
+            mostrarMensaje = true
+        }
+    }
     MenuLateral(navController) { innerPadding ->
-        // Apply vertical scroll to the Column
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState()), // Enable scroll here
+                .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Header(navController, viewModel)
+            HeaderPaginaPrincipal(
+                navController,
+                viewModel,
+                viewModelCaracteristicas,
+                dataUserViewModel,
+                calendarViewModel
+            )
 
-            Row(
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 40.dp),
+//                horizontalArrangement = Arrangement.SpaceEvenly,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+////                Btn_PaginaPrincipal(navController)
+////                Btn_PaginaCrearEntrenamiento(navController)
+////                Btn_Calendario(navController)
+//            }
+            Spacer(modifier = Modifier.height(16.dp))
+            CrearNuevoEntreanmiento(navController)
+           Spacer(modifier = Modifier.height(16.dp))
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                    .background(Color.White),
+                contentAlignment = Alignment.Center
             ) {
-                Btn_PaginaPrincipal(navController)
-                Btn_PaginaCrearEntrenamiento(navController)
-                Btn_Calendario(navController)
+
+                when {
+                    rutinasGuardadas.isNotEmpty() -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp)
+                        ) {
+                            items(rutinasGuardadas) { rutina ->
+                                RutinaCardEntrenamiento(rutina)
+                            }
+                        }
+                    }
+
+                    mostrarMensaje -> {
+                        Text(
+                            text = "No hay entrenamientos disponibles",
+                            color = Color.Black,
+                            fontSize = 18.sp
+                        )
+                    }
+
+                    else -> {
+                        CircularProgressIndicator(color = Color.Gray)
+                    }
+                }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            CrearNuevoEntreanmiento(navController, viewModel)
-
         }
     }
 }
 
 
 @Composable
-fun CrearNuevoEntreanmiento(navController: NavController, viewModel: MainViewModel) {
-    val entrenamientos = viewModel.entrenamientos
-    var selectedDate by remember { mutableStateOf<String?>(null) }
-    Column(
+fun CrearNuevoEntreanmiento(navController: NavController) {
+
+    Button(
+        onClick = { navController.navigate("categoriaEntrenamientos") },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = Color.Transparent
+        ),
         modifier = Modifier
-            .padding(30.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            .height(80.dp)
+            .fillMaxWidth()
+            .padding(20.dp)
+//            .shadow(
+//                elevation = 3.dp,
+//                shape = RoundedCornerShape(12.dp),
+//                clip = false
+//            )
+            .border(
+                width = 1.dp,
+                color = Color.Gray,
+                shape = RoundedCornerShape(20.dp)
+            ),
+        shape = RoundedCornerShape(12.dp)
         ) {
-            Button(
-                onClick = { navController.navigate("categoriaEntrenamientos") },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.Black
-                ),
-                modifier = Modifier.height(30.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = "mas",
-                    modifier = Modifier.size(18.dp),
-                    tint = Color.White
-                )
-            }
-
-        }
-//        Calendario(
-//            onDateSelected = { date ->
-//                selectedDate = date
-//            }
-//        )
-//        LazyEntrenamiento2(entrenamientos = entrenamientos, navController)
-
+        Text(
+            text = "Crea un nuevo entrenamiendo",
+            fontSize = 15.sp,
+            color = Color(144, 236, 128)
+        )
     }
 }
+
 
 @Composable
 fun LazyEntrenamiento2(
-    entrenamientos: List<CaracteristicasEntrenamientos>,
+    entrenamientos: List<DataClassCaracteristicasEntrenamientos>,
     navController: NavController
 ) {
     LazyColumn(
@@ -134,7 +192,7 @@ fun LazyEntrenamiento2(
 
 @Composable
 fun CardEntrenamientos2(
-    entrenamiento: CaracteristicasEntrenamientos,
+    entrenamiento: DataClassCaracteristicasEntrenamientos,
     navController: NavController
 ) {
     Card(
@@ -217,6 +275,55 @@ fun Calendario(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Confirmar")
+        }
+    }
+}
+
+
+@Composable
+fun RutinaCardEntrenamiento(rutina: DataClassCaracteristicasEntrenamientos) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(3.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            // horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text(
+                    text = rutina.nombreEntrenamiento ?: "Nombre desconocido",
+                    color = Color.Black,
+                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Text(
+                    text = rutina.nombre ?: "Rutina desconocida",
+                    color = Color.DarkGray,
+                    style = TextStyle(fontSize = 17.sp)
+                )
+            }
+
+
+//            rutina.subcategorias?.forEach { subcategoria ->
+//                Text(
+//                    text = "• $subcategoria",
+//                    color = Color.DarkGray,
+//                    fontSize = 16.sp
+//                )
+//            }
         }
     }
 }
