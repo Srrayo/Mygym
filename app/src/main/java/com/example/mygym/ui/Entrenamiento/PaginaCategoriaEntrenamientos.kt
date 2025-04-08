@@ -5,6 +5,7 @@ package com.example.mygym.ui.Entrenamiento
 import CaracteristicasEntrenamientoViewModel
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -42,6 +43,8 @@ fun PaginaCategoriaEntrenamientos(
     var nombreEntrenamiento by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    val diasSemana = listOf("L", "M", "X", "J", "V", "S", "D")
+    var diasSeleccionados by remember { mutableStateOf(setOf<String>()) }
 
     LaunchedEffect(userId) {
         if (userId.isNotEmpty()) {
@@ -60,9 +63,10 @@ fun PaginaCategoriaEntrenamientos(
             ) {
                 Button(
                     onClick = {
-                        if (categoriaSeleccionada != null && subcategoriaSeleccionada != null && nombreEntrenamiento.isNotEmpty()) {
+                        if (categoriaSeleccionada != null && subcategoriaSeleccionada != null && nombreEntrenamiento.isNotEmpty() &&
+                            diasSeleccionados.isNotEmpty()) {
                             viewModelCategoria.guardarRutinaEnFirestore(
-                                userId, categoriaSeleccionada!!, subcategoriaSeleccionada!!, nombreEntrenamiento
+                                userId, categoriaSeleccionada!!, subcategoriaSeleccionada!!, nombreEntrenamiento, diasSeleccionados
                             )
                             Toast.makeText(
                                 context,
@@ -92,7 +96,7 @@ fun PaginaCategoriaEntrenamientos(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(Color.White)
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -107,13 +111,13 @@ fun PaginaCategoriaEntrenamientos(
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.White,
-                    unfocusedIndicatorColor = Color.Gray,
-                    cursorColor = Color.White,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedLabelColor = Color.White,
-                    unfocusedLabelColor = Color.White
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
+                    cursorColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color.Black,
+                    unfocusedLabelColor = Color.Black
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), // Define la acción del teclado
                 keyboardActions = KeyboardActions(
@@ -125,13 +129,13 @@ fun PaginaCategoriaEntrenamientos(
             )
             Text(
                 text = "Categoría: ${categoriaSeleccionada ?: "No seleccionada"}\nSubcategoría: ${subcategoriaSeleccionada ?: "No seleccionada"}\nNombre: ${nombreEntrenamiento.ifEmpty { "No ingresado" }}",
-                color = Color.White,
+                color = Color.Black,
                 modifier = Modifier.padding(10.dp)
             )
             Button(
                 onClick = { mostrarLista = !mostrarLista },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Gray,
+                    containerColor = Color.Black,
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(3.dp)
@@ -152,6 +156,12 @@ fun PaginaCategoriaEntrenamientos(
                     }
                 }
             }
+            SelectorDiasSemana(
+                diasIniciales = diasSeleccionados,
+                onDiasSeleccionadosChange = { nuevosDias ->
+                    diasSeleccionados = nuevosDias
+                }
+            )
         }
     }
 }
@@ -168,9 +178,7 @@ fun EntrenamientosCardExpandible(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Column(
             modifier = Modifier
@@ -207,7 +215,59 @@ fun EntrenamientosCardExpandible(
                     }
                 }
             }
-
         }
     }
 }
+
+@Composable
+fun SelectorDiasSemana(
+    diasIniciales: Set<String> = emptySet(),
+    onDiasSeleccionadosChange: (Set<String>) -> Unit
+) {
+    val diasSemana = listOf("L", "M", "X", "J", "V", "S", "D")
+    var diasSeleccionados by remember { mutableStateOf(diasIniciales) }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = "Selecciona los días para este entrenamiento:",
+            color = Color.White,
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            diasSemana.forEach { dia ->
+                val estaSeleccionado = diasSeleccionados.contains(dia)
+
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            color = if (estaSeleccionado) Color(0xFF4CAF50) else Color.Gray,
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .clickable {
+                            diasSeleccionados = if (estaSeleccionado)
+                                diasSeleccionados - dia
+                            else
+                                diasSeleccionados + dia
+
+                            onDiasSeleccionadosChange(diasSeleccionados)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = dia,
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+    }
+}
+

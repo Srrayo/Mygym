@@ -99,14 +99,15 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
-    fun guardarRutinaEnFirestore(userId: String, categoria: String, subcategoria: String, nombreEntrenamiento: String) {
+    fun guardarRutinaEnFirestore(userId: String, categoria: String, subcategoria: String, nombreEntrenamiento: String, diasSeleccionados: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userDocRef = db.collection("usuarios").document(userId)
                 val rutina = mapOf(
                     "nombreEntrenamiento" to nombreEntrenamiento,
                     "categoria" to categoria,
-                    "subcategoria" to subcategoria
+                    "subcategoria" to subcategoria,
+                    "dias" to diasSeleccionados.toList()
                 )
 
                 Log.d("FirestoreDebug", "Guardando rutina: $rutina")
