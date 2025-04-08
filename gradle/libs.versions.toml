@@ -18,6 +18,7 @@ foundationAndroid = "1.7.8"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.2.0"
 lifecycleRuntimeKtxVersion = "2.6.0"
+materialCalendarview = "2.0.0"
 materialVersion = "1.7.8"
 maxkeppelerCalendarVersion = "<version>"
 navigationCompose = "2.8.8"
@@ -66,6 +67,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+material-calendarview = { module = "com.prolificinteractive:material-calendarview", version.ref = "materialCalendarview" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "androidxComposeMaterialMaterial" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "androidxUiToolingPreview" }

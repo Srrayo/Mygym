@@ -42,6 +42,7 @@ import com.example.mygym.model.MainViewModel
 import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
 
 
+//@RequiresApi(Build.VERSION_CODES.O)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaginaPrincipal(
