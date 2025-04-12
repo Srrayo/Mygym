@@ -38,7 +38,8 @@ fun PaginaCalendario(
     viewModel: MainViewModel,
     calendarViewModel: CalendarViewModel,
     dataUserViewModel: DataUserViewModel,
-    viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel
+    viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
+
 ) {
     MenuLateral(navController) { innerPadding ->
         Column(
@@ -56,7 +57,7 @@ fun PaginaCalendario(
                 calendarViewModel
             )
 
-            CalendarApp()
+            CalendarApp(calendarViewModel)
         }
     }
 }
@@ -64,7 +65,9 @@ fun PaginaCalendario(
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CalendarApp() {
+fun CalendarApp(
+    calendarViewModel: CalendarViewModel
+) {
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     var noteText by remember { mutableStateOf("") }
     var currentDate by remember { mutableStateOf(LocalDate.now()) }
@@ -73,7 +76,7 @@ fun CalendarApp() {
     val currentYear = currentDate.year
     val daysInMonth = currentMonth.length(currentDate.isLeapYear)
     val firstDayOfMonth = LocalDate.of(currentYear, currentMonth, 1)
-    val firstDayOfWeek = (firstDayOfMonth.dayOfWeek.value - 1) % 7 // Ajuste para Lunes=0
+    val firstDayOfWeek = (firstDayOfMonth.dayOfWeek.value - 1) % 7
     val monthName = currentMonth.getDisplayName(TextStyle.FULL, Locale.getDefault())
 
     val days = buildList {
@@ -105,6 +108,14 @@ fun CalendarApp() {
                 add(LocalDate.of(nextYear, nextMonth, day))
             }
         }
+    }
+
+    // Estado de fechas con entrenamientos
+    val fechasConEntrenamiento = calendarViewModel.fechasConEntrenamiento.collectAsState().value
+
+    // Cargar entrenamientos cuando se inicie la pantalla
+    LaunchedEffect(Unit) {
+        calendarViewModel.cargarEntrenamientos()
     }
 
     Column(
@@ -165,6 +176,7 @@ fun CalendarApp() {
                 val isCurrentMonth = date.month == currentMonth
                 val isToday = date == LocalDate.now()
                 val isSelected = selectedDate == date
+                val isEntrenamiento = fechasConEntrenamiento.contains(date)
 
                 Box(
                     modifier = Modifier
@@ -175,6 +187,7 @@ fun CalendarApp() {
                                 isToday && isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
                                 isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                                 isSelected -> MaterialTheme.colorScheme.primary
+                                isEntrenamiento -> Color.Yellow.copy(alpha = 0.4f)  // Resaltar en amarillo
                                 else -> Color.Transparent
                             }
                         )
@@ -226,7 +239,11 @@ fun CalendarApp() {
                 )
 
                 Button(
-                    onClick = { /* Guardar notas */ },
+                    onClick = {
+                        selectedDate?.let {
+                            calendarViewModel.guardarEntrenamiento(it, noteText)
+                        }
+                    },
                     modifier = Modifier.padding(top = 8.dp),
                     shape = RoundedCornerShape(8.dp)
                 ) {

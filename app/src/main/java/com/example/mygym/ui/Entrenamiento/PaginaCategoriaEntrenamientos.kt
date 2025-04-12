@@ -37,14 +37,17 @@ fun PaginaCategoriaEntrenamientos(
 ) {
     val caracteristicasEntrenamientos by viewModelCategoria.entrenamiento.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     var mostrarLista by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
     var subcategoriaSeleccionada by remember { mutableStateOf<String?>(null) }
     var nombreEntrenamiento by remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
-    val diasSemana = listOf("L", "M", "X", "J", "V", "S", "D")
     var diasSeleccionados by remember { mutableStateOf(setOf<String>()) }
+
+    val listaEjercicios = remember { mutableStateListOf<Map<String, Any>>() }
+    val bloqueTimestamp = remember { System.currentTimeMillis() }
 
     LaunchedEffect(userId) {
         if (userId.isNotEmpty()) {
@@ -61,34 +64,54 @@ fun PaginaCategoriaEntrenamientos(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(
-                    onClick = {
-                        if (categoriaSeleccionada != null && subcategoriaSeleccionada != null && nombreEntrenamiento.isNotEmpty() &&
-                            diasSeleccionados.isNotEmpty()) {
+                Button(onClick = {
+                    if (categoriaSeleccionada != null && subcategoriaSeleccionada != null) {
+                        val nuevoEjercicio = mapOf(
+                            "nombreEntrenamiento" to nombreEntrenamiento,
+                            "categoria" to categoriaSeleccionada!!,
+                            "subcategoria" to subcategoriaSeleccionada!!,
+                            "dias" to diasSeleccionados.toList()
+                        )
+                        listaEjercicios.add(nuevoEjercicio)
+
+                        // Limpiar solo categoría y subcategoría
+                        categoriaSeleccionada = null
+                        subcategoriaSeleccionada = null
+
+                        Toast.makeText(context, "Ejercicio añadido", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Selecciona categoría y subcategoría", Toast.LENGTH_SHORT).show()
+                    }
+                }) {
+                    Text("Añadir nuevo")
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(onClick = {
+                    if (listaEjercicios.isNotEmpty()) {
+                        listaEjercicios.forEachIndexed { index, rutina ->
+                            val categoria = rutina["categoria"] as String
+                            val subcategoria = rutina["subcategoria"] as String
+
                             viewModelCategoria.guardarRutinaEnFirestore(
-                                userId, categoriaSeleccionada!!, subcategoriaSeleccionada!!, nombreEntrenamiento, diasSeleccionados
+                                userId,
+                                categoria,
+                                subcategoria,
+                                nombreEntrenamiento,
+                                diasSeleccionados,
+                                bloqueTimestamp,
+                                index
                             )
-                            Toast.makeText(
-                                context,
-                                "Entrenamiento guardado correctamente",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            navController.navigate("tabRowPantallas")
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Tienes que rellenar todos los campos",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                    modifier = Modifier
-                        .width(150.dp)
-                        .padding(vertical = 20.dp)
-                        .height(45.dp),
-                ) {
-                    Text(text = "Guardar", color = Color.Black)
+
+                        Toast.makeText(context, "Rutinas guardadas en Firebase", Toast.LENGTH_LONG).show()
+                        navController.navigate("tabRowPantallas")
+                    } else {
+                        Toast.makeText(context, "No hay rutinas para guardar", Toast.LENGTH_SHORT).show()
+                    }
+                }) {
+                    Text("Guardar en Firebase")
                 }
             }
         }
@@ -101,43 +124,45 @@ fun PaginaCategoriaEntrenamientos(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             CerrarVentana(navController)
+
             TextField(
                 value = nombreEntrenamiento,
-                onValueChange = { nombreEntrenamiento = it },
+                onValueChange = {
+                    nombreEntrenamiento = it
+                    // Sincroniza nombre con todos los ejercicios en lista
+                    listaEjercicios.replaceAll { ejercicio ->
+                        ejercicio.toMutableMap().apply { this["nombreEntrenamiento"] = it }
+                    }
+                },
                 label = { Text(text = "Nombre del entrenamiento") },
-                modifier = Modifier
-                    .width(250.dp),
+                modifier = Modifier.width(250.dp),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                    }
+                ),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Black,
                     unfocusedIndicatorColor = Color.Black,
-                    cursorColor = Color.Black,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black,
                     focusedLabelColor = Color.Black,
                     unfocusedLabelColor = Color.Black
-                ),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), // Define la acción del teclado
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide() // Cierra el teclado
-                        focusManager.clearFocus() // Quita el foco del TextField (el cursor desaparece)
-                    }
                 )
             )
+
             Text(
-                text = "Categoría: ${categoriaSeleccionada ?: "No seleccionada"}\nSubcategoría: ${subcategoriaSeleccionada ?: "No seleccionada"}\nNombre: ${nombreEntrenamiento.ifEmpty { "No ingresado" }}",
+                text = "Categoría: ${categoriaSeleccionada ?: "No seleccionada"}\nSubcategoría: ${subcategoriaSeleccionada ?: "No seleccionada"}",
                 color = Color.Black,
                 modifier = Modifier.padding(10.dp)
             )
+
             Button(
                 onClick = { mostrarLista = !mostrarLista },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
                 shape = RoundedCornerShape(3.dp)
             ) {
                 Text(text = "Categorías")
@@ -156,16 +181,47 @@ fun PaginaCategoriaEntrenamientos(
                     }
                 }
             }
+
             SelectorDiasSemana(
                 diasIniciales = diasSeleccionados,
                 onDiasSeleccionadosChange = { nuevosDias ->
                     diasSeleccionados = nuevosDias
+                    listaEjercicios.replaceAll { ejercicio ->
+                        ejercicio.toMutableMap().apply { this["dias"] = nuevosDias.toList() }
+                    }
                 }
             )
+
+            Divider(modifier = Modifier.padding(vertical = 10.dp))
+
+            Text("Rutinas archivadas:", color = Color.Black)
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .weight(1f)
+            ) {
+                items(listaEjercicios) { rutina ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F7FA))
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text("Nombre: ${rutina["nombreEntrenamiento"]}")
+                            Text("Categoría: ${rutina["categoria"]}")
+                            Text("Subcategoría: ${rutina["subcategoria"]}")
+                            Text("Días: ${(rutina["dias"] as List<String>).joinToString(", ")}")
+                        }
+                    }
+                }
+            }
         }
     }
-}
-
+} // Fin PaginaCategoriaEntrenamientos
 
 @Composable
 fun EntrenamientosCardExpandible(
@@ -270,4 +326,3 @@ fun SelectorDiasSemana(
         }
     }
 }
-

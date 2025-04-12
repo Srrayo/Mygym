@@ -42,7 +42,6 @@ import com.example.mygym.model.MainViewModel
 import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
 
 
-//@RequiresApi(Build.VERSION_CODES.O)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaginaPrincipal(
@@ -70,18 +69,7 @@ fun PaginaPrincipal(
                 .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            HeaderPaginaPrincipal(navController,viewModel,viewModelCaracteristicas,dataUserViewModel,calendarViewModel)
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-//                Btn_PaginaPrincipal(navController)
-//                Btn_PaginaCrearEntrenamiento(navController)
-//                Btn_Calendario(navController)
-            }
+            HeaderPaginaPrincipal(navController, viewModel, viewModelCaracteristicas, dataUserViewModel, calendarViewModel)
 
             Box(
                 modifier = Modifier
@@ -106,7 +94,6 @@ fun PaginaPrincipal(
                             text = "No hay entrenamientos disponibles",
                             color = Color.Black,
                             fontSize = 18.sp
-//                            fontWeight = FontWeight.Bold
                         )
                     }
 
@@ -119,51 +106,42 @@ fun PaginaPrincipal(
     }
 }
 
-
 @Composable
 fun RutinaCard(rutina: DataClassCaracteristicasEntrenamientos) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(3.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(vertical = 6.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-           // horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ){
+        Column(modifier = Modifier.padding(16.dp)) {
 
+            Text(
+                text = rutina.nombreEntrenamiento ?: "Entrenamiento sin nombre",
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.padding(vertical = 4.dp))
+
+            rutina.dias?.takeIf { it.isNotEmpty() }?.let {
                 Text(
-                    text = rutina.nombreEntrenamiento ?: "Nombre desconocido",
-                    color = Color.Black,
-                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Text(
-                    text = rutina.nombre ?: "Rutina desconocida",
-                    color = Color.DarkGray,
-                    style = TextStyle(fontSize = 17.sp)
+                    text = "📅 Días: ${it.joinToString(", ")}",
+                    style = TextStyle(fontSize = 16.sp),
+                    color = Color.DarkGray
                 )
             }
 
-
-            rutina.subcategorias?.forEach { subcategoria ->
+            rutina.subcategorias?.takeIf { it.isNotEmpty() }?.let {
                 Text(
-                    text = "• $subcategoria",
-                    color = Color.DarkGray,
-                    fontSize = 16.sp
+                    text = "📦 Categorías: ${it.joinToString(", ")}",
+                    style = TextStyle(fontSize = 16.sp),
+                    color = Color.DarkGray
                 )
             }
         }
     }
 }
+

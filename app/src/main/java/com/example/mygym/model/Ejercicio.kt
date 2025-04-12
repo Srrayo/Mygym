@@ -1,7 +1,8 @@
 package com.example.mygym.model
 
 data class Ejercicio(
-    val name:String,
+    val nombreEjercicio: String,
     val series: Int,
-    val descanso: Int
+    val repeticiones: Int,
+    val peso: Float? // Opcional
 )

@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -89,21 +90,9 @@ fun PaginaEntrenamiento(
                 dataUserViewModel,
                 calendarViewModel
             )
-
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 40.dp),
-//                horizontalArrangement = Arrangement.SpaceEvenly,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-////                Btn_PaginaPrincipal(navController)
-////                Btn_PaginaCrearEntrenamiento(navController)
-////                Btn_Calendario(navController)
-//            }
             Spacer(modifier = Modifier.height(16.dp))
             CrearNuevoEntreanmiento(navController)
-           Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Box(
                 modifier = Modifier
@@ -148,29 +137,22 @@ fun CrearNuevoEntreanmiento(navController: NavController) {
     Button(
         onClick = { navController.navigate("categoriaEntrenamientos") },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = Color.Transparent
+            containerColor = Color(0xFF4CAF50), // Verde brillante
+            contentColor = Color.White // Color blanco para el texto
         ),
         modifier = Modifier
             .height(80.dp)
             .fillMaxWidth()
-            .padding(20.dp)
-//            .shadow(
-//                elevation = 3.dp,
-//                shape = RoundedCornerShape(12.dp),
-//                clip = false
-//            )
-            .border(
-                width = 1.dp,
-                color = Color.Gray,
-                shape = RoundedCornerShape(20.dp)
-            ),
-        shape = RoundedCornerShape(12.dp)
-        ) {
+            .padding(16.dp)
+            .clip(RoundedCornerShape(50.dp)) // Forma de píldora para bordes más suaves
+            .shadow(4.dp, RoundedCornerShape(50.dp)), // Sombra para darle profundidad
+        shape = RoundedCornerShape(50.dp) // Píldora
+    ) {
         Text(
-            text = "Crea un nuevo entrenamiendo",
-            fontSize = 15.sp,
-            color = Color(144, 236, 128)
+            text = "Crea un nuevo entrenamiento",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
         )
     }
 }
@@ -236,48 +218,48 @@ fun CardEntrenamientos2(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Calendario(
-    onDateSelected: (String) -> Unit
-) {
-    val datePickerState = rememberDatePickerState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        // Título del calendario
-        Text(
-            text = "Selecciona una fecha",
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        // DatePicker mostrando el calendario
-        DatePicker(
-            state = datePickerState,
-            headline = {
-                Text("Fecha seleccionada: ${datePickerState.selectedDateMillis?.let { formatDate(it) } ?: "Ninguna"}")
-            },
-            showModeToggle = true // Permite cambiar entre la vista de calendario y entrada manual
-        )
-
-        // Botón para confirmar la selección de fecha
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-                val selectedDateMillis = datePickerState.selectedDateMillis
-                selectedDateMillis?.let {
-                    onDateSelected(formatDate(it))
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Confirmar")
-        }
-    }
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun Calendario(
+//    onDateSelected: (String) -> Unit
+//) {
+//    val datePickerState = rememberDatePickerState()
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(16.dp)
+//    ) {
+//        // Título del calendario
+//        Text(
+//            text = "Selecciona una fecha",
+//            style = MaterialTheme.typography.titleMedium
+//        )
+//
+//        // DatePicker mostrando el calendario
+//        DatePicker(
+//            state = datePickerState,
+//            headline = {
+//                Text("Fecha seleccionada: ${datePickerState.selectedDateMillis?.let { formatDate(it) } ?: "Ninguna"}")
+//            },
+//            showModeToggle = true // Permite cambiar entre la vista de calendario y entrada manual
+//        )
+//
+//        // Botón para confirmar la selección de fecha
+//        Spacer(modifier = Modifier.height(16.dp))
+//        Button(
+//            onClick = {
+//                val selectedDateMillis = datePickerState.selectedDateMillis
+//                selectedDateMillis?.let {
+//                    onDateSelected(formatDate(it))
+//                }
+//            },
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text("Confirmar")
+//        }
+//    }
+//}
 
 
 @Composable
@@ -310,7 +292,7 @@ fun RutinaCardEntrenamiento(rutina: DataClassCaracteristicasEntrenamientos) {
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = rutina.nombre ?: "Rutina desconocida",
+                    text = rutina.nombreEntrenamiento ?: "Rutina desconocida",
                     color = Color.DarkGray,
                     style = TextStyle(fontSize = 17.sp)
                 )

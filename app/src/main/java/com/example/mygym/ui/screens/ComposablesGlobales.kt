@@ -407,198 +407,198 @@ fun MenuLateral(
 }
 // -- ↑ Menu lateral ↑ --------------------------------------------------------------------------------
 
-@Composable
-fun CalendarioApp(viewModel: CalendarViewModel = viewModel()) {
-    var showDatePickerDialog by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf("Selecciona una fecha") }
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Primer Calendario",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = selectedDate,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Button(onClick = { showDatePickerDialog = true }) {
-            Text("Seleccionar fecha")
-        }
-
-        if (showDatePickerDialog) {
-            DatePickerDialog(
-                onDismissRequest = { showDatePickerDialog = false },
-                onDateSelected = { date ->
-                    selectedDate = date
-                    val dateMillis = parseDate(date)
-                    dateMillis?.let { viewModel.addSelectedDate(it) }
-                    showDatePickerDialog = false
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialog(
-    onDismissRequest: () -> Unit,
-    onDateSelected: (String) -> Unit
-) {
-    val datePickerState = rememberDatePickerState()
-
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                DatePicker(
-                    state = datePickerState,
-                    title = {
-                        Text("Selecciona una fecha")
-                    },
-                    headline = {
-                        Text(
-                            "Fecha seleccionada: ${
-                                datePickerState.selectedDateMillis?.let {
-                                    formatDate(
-                                        it
-                                    )
-                                } ?: "Ninguna"
-                            }")
-                    },
-                    showModeToggle = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        val selectedDateMillis = datePickerState.selectedDateMillis
-                        selectedDateMillis?.let {
-                            onDateSelected(formatDate(it))
-                        }
-                        onDismissRequest()
-                    }
-                ) {
-                    Text("Confirmar")
-                }
-            }
-        }
-    }
-}
-
-fun formatDate(millis: Long): String {
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return dateFormat.format(Date(millis))
-}
-
-
-@Composable
-fun SecondCalendar(viewModel: CalendarViewModel) {
-    val selectedDates = viewModel.selectedDates
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-
-    val daysInMonth = getDaysInMonth(year, month)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Segundo Calendario",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(daysInMonth) { day ->
-                val dateMillis = getDateMillis(year, month, day)
-                val isSelected = selectedDates.any { it.timestamp == dateMillis }
-
-                DayCell(day = day, isSelected = isSelected)
-            }
-        }
-    }
-}
-
-@Composable
-fun DayCell(day: Int, isSelected: Boolean) {
-    Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .size(40.dp)
-            .background(
-                color = if (isSelected) Color.Green.copy(alpha = 0.3f) else Color.Transparent,
-                shape = CircleShape
-            )
-            .border(
-                width = 1.dp,
-                color = if (isSelected) Color.Green else Color.LightGray,
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = if (day > 0) day.toString() else "",
-            style = MaterialTheme.typography.bodyMedium,
-            color = if (isSelected) Color.Green else Color.Black
-        )
-    }
-}
-
-private fun getDaysInMonth(year: Int, month: Int): List<Int> {
-    val calendar = Calendar.getInstance()
-    calendar.set(year, month, 1)
-    val maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-    val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-
-    val daysInMonth = mutableListOf<Int>()
-    // Agregar espacios vacíos para los días que no pertenecen al mes
-    for (i in 1 until firstDayOfWeek) {
-        daysInMonth.add(0) // 0 representa un día vacío
-    }
-    // Agregar los días del mes
-    for (day in 1..maxDay) {
-        daysInMonth.add(day)
-    }
-    return daysInMonth
-}
+//@Composable
+//fun CalendarioApp(viewModel: CalendarViewModel = viewModel()) {
+//    var showDatePickerDialog by remember { mutableStateOf(false) }
+//    var selectedDate by remember { mutableStateOf("Selecciona una fecha") }
+//
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
+//    ) {
+//        Text(
+//            text = "Primer Calendario",
+//            style = MaterialTheme.typography.headlineLarge,
+//            fontWeight = FontWeight.Bold,
+//            color = Color.Black
+//        )
+//        Spacer(modifier = Modifier.height(20.dp))
+//
+//        Text(
+//            text = selectedDate,
+//            style = MaterialTheme.typography.bodyMedium,
+//            modifier = Modifier.padding(8.dp)
+//        )
+//
+//        Spacer(modifier = Modifier.height(20.dp))
+//
+//        Button(onClick = { showDatePickerDialog = true }) {
+//            Text("Seleccionar fecha")
+//        }
+//
+//        if (showDatePickerDialog) {
+//            DatePickerDialog(
+//                onDismissRequest = { showDatePickerDialog = false },
+//                onDateSelected = { date ->
+//                    selectedDate = date
+//                    val dateMillis = parseDate(date)
+//                    dateMillis?.let { viewModel.addSelectedDate(it) }
+//                    showDatePickerDialog = false
+//                }
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(40.dp))
+//    }
+//}
+//
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun DatePickerDialog(
+//    onDismissRequest: () -> Unit,
+//    onDateSelected: (String) -> Unit
+//) {
+//    val datePickerState = rememberDatePickerState()
+//
+//    Dialog(
+//        onDismissRequest = onDismissRequest,
+//        properties = DialogProperties(
+//            dismissOnBackPress = true,
+//            dismissOnClickOutside = true
+//        )
+//    ) {
+//        Surface(
+//            modifier = Modifier.fillMaxWidth(),
+//            shape = MaterialTheme.shapes.medium
+//        ) {
+//            Column(
+//                modifier = Modifier.padding(16.dp)
+//            ) {
+//                DatePicker(
+//                    state = datePickerState,
+//                    title = {
+//                        Text("Selecciona una fecha")
+//                    },
+//                    headline = {
+//                        Text(
+//                            "Fecha seleccionada: ${
+//                                datePickerState.selectedDateMillis?.let {
+//                                    formatDate(
+//                                        it
+//                                    )
+//                                } ?: "Ninguna"
+//                            }")
+//                    },
+//                    showModeToggle = true
+//                )
+//
+//                Spacer(modifier = Modifier.height(16.dp))
+//
+//                Button(
+//                    onClick = {
+//                        val selectedDateMillis = datePickerState.selectedDateMillis
+//                        selectedDateMillis?.let {
+//                            onDateSelected(formatDate(it))
+//                        }
+//                        onDismissRequest()
+//                    }
+//                ) {
+//                    Text("Confirmar")
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//fun formatDate(millis: Long): String {
+//    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+//    return dateFormat.format(Date(millis))
+//}
+//
+//
+//@Composable
+//fun SecondCalendar(viewModel: CalendarViewModel) {
+//    val selectedDates = viewModel.selectedDates
+//    val calendar = Calendar.getInstance()
+//    val year = calendar.get(Calendar.YEAR)
+//    val month = calendar.get(Calendar.MONTH)
+//
+//    val daysInMonth = getDaysInMonth(year, month)
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(16.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Text(
+//            text = "Segundo Calendario",
+//            style = MaterialTheme.typography.headlineLarge,
+//            fontWeight = FontWeight.Bold,
+//            color = Color.Black
+//        )
+//        Spacer(modifier = Modifier.height(20.dp))
+//
+//        LazyVerticalGrid(
+//            columns = GridCells.Fixed(7),
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            items(daysInMonth) { day ->
+//                val dateMillis = getDateMillis(year, month, day)
+//                val isSelected = selectedDates.any { it.timestamp == dateMillis }
+//
+//                DayCell(day = day, isSelected = isSelected)
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//fun DayCell(day: Int, isSelected: Boolean) {
+//    Box(
+//        modifier = Modifier
+//            .padding(4.dp)
+//            .size(40.dp)
+//            .background(
+//                color = if (isSelected) Color.Green.copy(alpha = 0.3f) else Color.Transparent,
+//                shape = CircleShape
+//            )
+//            .border(
+//                width = 1.dp,
+//                color = if (isSelected) Color.Green else Color.LightGray,
+//                shape = CircleShape
+//            ),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Text(
+//            text = if (day > 0) day.toString() else "",
+//            style = MaterialTheme.typography.bodyMedium,
+//            color = if (isSelected) Color.Green else Color.Black
+//        )
+//    }
+//}
+//
+//private fun getDaysInMonth(year: Int, month: Int): List<Int> {
+//    val calendar = Calendar.getInstance()
+//    calendar.set(year, month, 1)
+//    val maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+//    val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+//
+//    val daysInMonth = mutableListOf<Int>()
+//    // Agregar espacios vacíos para los días que no pertenecen al mes
+//    for (i in 1 until firstDayOfWeek) {
+//        daysInMonth.add(0) // 0 representa un día vacío
+//    }
+//    // Agregar los días del mes
+//    for (day in 1..maxDay) {
+//        daysInMonth.add(day)
+//    }
+//    return daysInMonth
+//}
 
 @Composable
 fun CerrarVentana(
@@ -626,19 +626,19 @@ fun CerrarVentana(
     }
 }
 
-// Convertir un día, mes y año a milisegundos
-private fun getDateMillis(year: Int, month: Int, day: Int): Long {
-    val calendar = Calendar.getInstance()
-    calendar.set(year, month, day)
-    return calendar.timeInMillis
-}
-
-private fun parseDate(dateString: String): Long? {
-    return try {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val date = dateFormat.parse(dateString)
-        date?.time
-    } catch (e: Exception) {
-        null
-    }
-}
+//// Convertir un día, mes y año a milisegundos
+//private fun getDateMillis(year: Int, month: Int, day: Int): Long {
+//    val calendar = Calendar.getInstance()
+//    calendar.set(year, month, day)
+//    return calendar.timeInMillis
+//}
+//
+//private fun parseDate(dateString: String): Long? {
+//    return try {
+//        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+//        val date = dateFormat.parse(dateString)
+//        date?.time
+//    } catch (e: Exception) {
+//        null
+//    }
+//}

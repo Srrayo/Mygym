@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel = mainViewModel,
                                 calendarViewModel = CalendarViewModel(),
                                 dataUserViewModel = dataUserViewModel,
-                                viewModelCaracteristicas = categoriaEntrenamientoViewModel
+                                viewModelCaracteristicas = CaracteristicasEntrenamientoViewModel()
                             )
                         }
                         composable("edicionEntrenamiento") {
@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                         composable("categoriaEntrenamientos") {
                             PaginaCategoriaEntrenamientos(
                                 navController = navController,
-                                viewModelCategoria = categoriaEntrenamientoViewModel,
+                                viewModelCategoria = CaracteristicasEntrenamientoViewModel(),
                                 userId = userId
                             )
                         }
@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 dataUserViewModel = dataUserViewModel,
                                 calendarViewModel = CalendarViewModel(),
-                                viewModelCaracteristicas = categoriaEntrenamientoViewModel,
+                                viewModelCaracteristicas = CaracteristicasEntrenamientoViewModel(),
                                 viewModel = mainViewModel
                             )
                         }

@@ -99,63 +99,148 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
-    fun guardarRutinaEnFirestore(userId: String, categoria: String, subcategoria: String, nombreEntrenamiento: String, diasSeleccionados: Set<String>) {
+    fun guardarRutinaEnFirestore(
+        userId: String,
+        categoria: String,
+        subcategoria: String,
+        nombreEntrenamiento: String,
+        diasSeleccionados: Set<String>,
+        bloqueTimestamp: Long,
+        rutinaIndex: Int
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userDocRef = db.collection("usuarios").document(userId)
+
+                // Creando el objeto de rutina
                 val rutina = mapOf(
                     "nombreEntrenamiento" to nombreEntrenamiento,
                     "categoria" to categoria,
                     "subcategoria" to subcategoria,
-                    "dias" to diasSeleccionados.toList()
+                    "dias" to diasSeleccionados.toList()  // Convirtiendo el set a lista
                 )
 
-                Log.d("FirestoreDebug", "Guardando rutina: $rutina")
+                // Usando un identificador único para el bloque de entrenamiento
+                val bloqueId = "bloqueEntrenamiento_$bloqueTimestamp"
+                val rutinaKey = "rutina_$rutinaIndex"
 
-                val documentSnapshot = userDocRef.get().await()
+                // Obtener el documento del usuario
+                val snapshot = userDocRef.get().await()
+                val rutinasGuardadas: MutableMap<String, Any> = mutableMapOf()
 
-                if (documentSnapshot.exists() && documentSnapshot.contains("rutinasGuardadas")) {
-                    userDocRef.update("rutinasGuardadas", FieldValue.arrayUnion(rutina)).await()
-                    userDocRef.update("fechaCreacion", FieldValue.serverTimestamp()).await()
-                    Log.d("FirestoreDebug", "Rutina y fecha actualizadas correctamente.")
+                // Si el documento existe, obtenemos las rutinas guardadas
+                if (snapshot.exists()) {
+                    val rutinas = snapshot.get("rutinasGuardadas") as? Map<String, Any> ?: mutableMapOf()
+
+                    // Verificamos si el bloque ya existe
+                    if (rutinas.containsKey(bloqueId)) {
+                        val bloqueContent = rutinas[bloqueId] as? MutableMap<String, Any> ?: mutableMapOf()
+                        // Añadimos o actualizamos la rutina dentro del bloque
+                        bloqueContent[rutinaKey] = listOf(rutina)
+                        rutinasGuardadas[bloqueId] = bloqueContent
+                    } else {
+                        // Si no existe el bloque, lo creamos con la nueva rutina
+                        rutinasGuardadas[bloqueId] = mapOf(rutinaKey to listOf(rutina))
+                    }
                 } else {
-                    userDocRef.set(
-                        mapOf(
-                            "rutinasGuardadas" to listOf(rutina),
-                            "fecha_creacion" to FieldValue.serverTimestamp()
-                        ),
-                        SetOptions.merge()
-                    ).await()
-                    Log.d("FirestoreDebug", "Rutina y fecha guardadas correctamente.")
+                    // Si el documento no existe, creamos una nueva estructura
+                    rutinasGuardadas[bloqueId] = mapOf(rutinaKey to listOf(rutina))
                 }
+
+                // Guardamos o actualizamos el documento con las rutinas
+                userDocRef.set(
+                    mapOf(
+                        "rutinasGuardadas" to rutinasGuardadas,
+                        "fechaCreacion" to FieldValue.serverTimestamp()
+                    ),
+                    SetOptions.merge()  // Mantenemos los datos existentes y solo actualizamos lo necesario
+                ).await()
+
+                Log.d("FirestoreDebug", "Rutina guardada correctamente con nueva estructura.")
             } catch (e: Exception) {
-                Log.e("FirestoreDebug", "Error en guardarRutinaEnFirestore: ${e.message}")
+                Log.e("FirestoreDebug", "Error al guardar nueva rutina: ${e.message}")
             }
         }
     }
+
+
+
+//    fun getRutinasGuardadas(userId: String) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//                val userDoc = db.collection("usuarios").document(userId).get().await()
+//                val rutinasGuardadasMap = userDoc.get("rutinasGuardadas") as? Map<*, *> ?: emptyMap<Any, Any>()
+//
+//                val rutinas = mutableListOf<DataClassCaracteristicasEntrenamientos>()
+//
+//                for ((_, bloque) in rutinasGuardadasMap) {
+//                    val bloqueMap = bloque as? Map<*, *> ?: continue
+//
+//                    for ((_, rutinaList) in bloqueMap) {
+//                        val rutinasDentro = rutinaList as? List<Map<String, Any>> ?: continue
+//
+//                        for (rutina in rutinasDentro) {
+//                            val categoria = rutina["categoria"] as? String
+//                            val subcategoria = rutina["subcategoria"] as? String
+//                            val nombre = rutina["nombreEntrenamiento"] as? String
+//                            val dias = rutina["dias"] as? List<String>
+//
+//                            if (categoria != null && subcategoria != null && nombre != null) {
+//                                rutinas.add(
+//                                    DataClassCaracteristicasEntrenamientos(
+//                                        nombre = categoria,
+//                                        subcategorias = listOf(subcategoria),
+//                                        nombreEntrenamiento = nombre,
+//                                        dias = dias,
+//                                        categoria = categoria
+//                                    )
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                _rutinasGuardadas.value = rutinas
+//                Log.d("FirestoreDebug", "Rutinas guardadas obtenidas: $rutinas")
+//            } catch (e: Exception) {
+//                Log.e("FirestoreDebug", "Error al obtener rutinas guardadas: ${e.message}")
+//            }
+//        }
+//    }
+
+
 
     fun getRutinasGuardadas(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userDoc = db.collection("usuarios").document(userId).get().await()
-                val rutinasGuardadas = userDoc.get("rutinasGuardadas") as? List<Map<String, Any>> ?: emptyList()
+                val rutinasMap = userDoc.get("rutinasGuardadas") as? Map<String, Map<String, List<Map<String, Any>>>> ?: emptyMap()
 
-                val rutinas = rutinasGuardadas.mapNotNull { rutina ->
-                    val categoria = rutina["categoria"] as? String
-                    val subcategoria = rutina["subcategoria"] as? String
-                    val nombre = rutina["nombreEntrenamiento"] as? String
-                    if (categoria != null && subcategoria != null && nombre != null) {
-                        DataClassCaracteristicasEntrenamientos(categoria, listOf(subcategoria), nombre)
-                    } else {
-                        null
+                val rutinas = rutinasMap.mapNotNull { (bloqueId, rutinaSet) ->
+                    val firstRutina = rutinaSet.values.firstOrNull()?.firstOrNull()
+                    firstRutina?.let { rutina ->
+                        val nombre = rutina["nombreEntrenamiento"] as? String
+                        val subcategoria = rutina["subcategoria"] as? String
+                        val dias = rutina["dias"] as? List<String>
+                        if (nombre != null && subcategoria != null) {
+                            DataClassCaracteristicasEntrenamientos(
+                                nombre = null,
+                                subcategorias = listOf(subcategoria),
+                                nombreEntrenamiento = nombre,
+                                dias = dias,
+                                categoria = bloqueId // Mostramos el bloque como referencia
+                            )
+                        } else null
                     }
                 }
 
                 _rutinasGuardadas.value = rutinas
-                Log.d("FirestoreDebug", "Rutinas guardadas obtenidas: $rutinas")
+                Log.d("FirestoreDebug", "Rutinas cargadas (una por bloque): $rutinas")
+
             } catch (e: Exception) {
                 Log.e("FirestoreDebug", "Error al obtener rutinas guardadas: ${e.message}")
             }
         }
     }
+
 }
