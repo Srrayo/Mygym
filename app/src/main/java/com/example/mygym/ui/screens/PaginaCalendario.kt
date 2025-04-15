@@ -40,25 +40,14 @@ fun PaginaCalendario(
     dataUserViewModel: DataUserViewModel,
     viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
 
-) {
-    MenuLateral(navController) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            HeaderPaginaPrincipal(
-                navController,
-                viewModel,
-                viewModelCaracteristicas,
-                dataUserViewModel,
-                calendarViewModel
-            )
-
-            CalendarApp(calendarViewModel)
-        }
+    ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        CalendarApp(calendarViewModel)
     }
 }
 
@@ -85,7 +74,8 @@ fun CalendarApp(
         if (prevMonthDays > 0) {
             val prevMonth = currentMonth.minus(1)
             val prevYear = if (currentMonth == Month.JANUARY) currentYear - 1 else currentYear
-            val daysInPrevMonth = Month.valueOf(prevMonth.name).length(LocalDate.of(prevYear, prevMonth, 1).isLeapYear)
+            val daysInPrevMonth = Month.valueOf(prevMonth.name)
+                .length(LocalDate.of(prevYear, prevMonth, 1).isLeapYear)
 
             for (i in prevMonthDays downTo 1) {
                 add(LocalDate.of(prevYear, prevMonth, daysInPrevMonth - i + 1))
@@ -121,6 +111,7 @@ fun CalendarApp(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(236, 240, 241))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -131,17 +122,18 @@ fun CalendarApp(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { currentDate = currentDate.minusMonths(1) }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Mes Anterior")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Mes Anterior", tint = Color.Black)
             }
 
             Text(
                 text = "$monthName $currentYear",
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = Color.Black,
             )
 
             IconButton(onClick = { currentDate = currentDate.plusMonths(1) }) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Mes Siguiente")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Mes Siguiente", tint = Color.Black)
             }
         }
 
@@ -156,6 +148,7 @@ fun CalendarApp(
                 Text(
                     text = day,
                     style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black,
                     modifier = Modifier.width(40.dp),
                     textAlign = TextAlign.Center
                 )
@@ -184,10 +177,13 @@ fun CalendarApp(
                         .clip(RoundedCornerShape(8.dp))
                         .background(
                             when {
-                                isToday && isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                isToday && isSelected -> MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.7f
+                                )
+
                                 isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                                 isSelected -> MaterialTheme.colorScheme.primary
-                                isEntrenamiento -> Color.Yellow.copy(alpha = 0.4f)  // Resaltar en amarillo
+                                isEntrenamiento -> Color.Yellow.copy(alpha = 0.4f)
                                 else -> Color.Transparent
                             }
                         )
@@ -203,9 +199,9 @@ fun CalendarApp(
                     Text(
                         text = dayOfMonth.toString(),
                         color = when {
-                            !isCurrentMonth -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                            !isCurrentMonth -> Color.Gray
                             isSelected -> MaterialTheme.colorScheme.onPrimary
-                            else -> MaterialTheme.colorScheme.onSurface
+                            else -> Color.Black
                         },
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -224,7 +220,12 @@ fun CalendarApp(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Notas para ${date.dayOfMonth} de ${date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())}",
+                    text = "Notas para ${date.dayOfMonth} de ${
+                        date.month.getDisplayName(
+                            TextStyle.FULL,
+                            Locale.getDefault()
+                        )
+                    }",
                     style = MaterialTheme.typography.bodyLarge
                 )
 

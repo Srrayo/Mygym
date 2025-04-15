@@ -4,7 +4,9 @@ package com.example.mygym.ui.Entrenamiento
 
 import CaracteristicasEntrenamientoViewModel
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,10 +18,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,13 +43,11 @@ fun PaginaCategoriaEntrenamientos(
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-
     var mostrarLista by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
     var subcategoriaSeleccionada by remember { mutableStateOf<String?>(null) }
     var nombreEntrenamiento by remember { mutableStateOf("") }
     var diasSeleccionados by remember { mutableStateOf(setOf<String>()) }
-
     val listaEjercicios = remember { mutableStateListOf<Map<String, Any>>() }
     val bloqueTimestamp = remember { System.currentTimeMillis() }
 
@@ -57,61 +59,87 @@ fun PaginaCategoriaEntrenamientos(
 
     Scaffold(
         bottomBar = {
-            Column(
+            Row(
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
+                    .background(Color(44, 44, 44))
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = {
-                    if (categoriaSeleccionada != null && subcategoriaSeleccionada != null) {
-                        val nuevoEjercicio = mapOf(
-                            "nombreEntrenamiento" to nombreEntrenamiento,
-                            "categoria" to categoriaSeleccionada!!,
-                            "subcategoria" to subcategoriaSeleccionada!!,
-                            "dias" to diasSeleccionados.toList()
-                        )
-                        listaEjercicios.add(nuevoEjercicio)
+                Button(
+                    onClick = {
+                        if (categoriaSeleccionada != null && subcategoriaSeleccionada != null) {
+                            val nuevoEjercicio = mapOf(
+                                "nombreEntrenamiento" to nombreEntrenamiento,
+                                "categoria" to categoriaSeleccionada!!,
+                                "subcategoria" to subcategoriaSeleccionada!!,
+                                "dias" to diasSeleccionados.toList()
+                            )
+                            listaEjercicios.add(nuevoEjercicio)
 
-                        // Limpiar solo categoría y subcategoría
-                        categoriaSeleccionada = null
-                        subcategoriaSeleccionada = null
+                            categoriaSeleccionada = null
+                            subcategoriaSeleccionada = null
 
-                        Toast.makeText(context, "Ejercicio añadido", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Selecciona categoría y subcategoría", Toast.LENGTH_SHORT).show()
-                    }
-                }) {
+                            Toast.makeText(context, "Ejercicio añadido", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Selecciona categoría y subcategoría",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }, colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(244, 208, 63),
+                        contentColor = Color.White,
+                    ),
+                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier.padding(bottom = 15.dp)
+                ) {
                     Text("Añadir nuevo")
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.width(20.dp))
 
-                Button(onClick = {
-                    if (listaEjercicios.isNotEmpty()) {
-                        listaEjercicios.forEachIndexed { index, rutina ->
-                            val categoria = rutina["categoria"] as String
-                            val subcategoria = rutina["subcategoria"] as String
+                Button(
+                    onClick = {
+                        if (listaEjercicios.isNotEmpty()) {
+                            listaEjercicios.forEachIndexed { index, rutina ->
+                                val categoria = rutina["categoria"] as String
+                                val subcategoria = rutina["subcategoria"] as String
 
-                            viewModelCategoria.guardarRutinaEnFirestore(
-                                userId,
-                                categoria,
-                                subcategoria,
-                                nombreEntrenamiento,
-                                diasSeleccionados,
-                                bloqueTimestamp,
-                                index
-                            )
+                                viewModelCategoria.guardarRutinaEnFirestore(
+                                    userId,
+                                    categoria,
+                                    subcategoria,
+                                    nombreEntrenamiento,
+                                    diasSeleccionados,
+                                    bloqueTimestamp,
+                                    index
+                                )
+                            }
+
+                            Toast.makeText(
+                                context,
+                                "Rutinas guardadas en Firebase",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            navController.navigate("tabRowPantallas")
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "No hay rutinas para guardar",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-
-                        Toast.makeText(context, "Rutinas guardadas en Firebase", Toast.LENGTH_LONG).show()
-                        navController.navigate("tabRowPantallas")
-                    } else {
-                        Toast.makeText(context, "No hay rutinas para guardar", Toast.LENGTH_SHORT).show()
-                    }
-                }) {
-                    Text("Guardar en Firebase")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    modifier = Modifier.padding(bottom = 15.dp),
+                    shape = RoundedCornerShape(5.dp)
+                ) {
+                    Text("Guardar entrenamiento")
                 }
             }
         }
@@ -119,11 +147,40 @@ fun PaginaCategoriaEntrenamientos(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(Color(236, 240, 241))
                 .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             CerrarVentana(navController)
+
+            Row(modifier = Modifier.padding(10.dp)) {
+                Column() {
+                    Text(
+                        text = "Categoría: ",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = categoriaSeleccionada ?: "No seleccionada",
+                        color = Color.Gray
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                Column() {
+                    Text(
+                        text = "Subcategoría: ",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = subcategoriaSeleccionada ?: "No seleccionada",
+                        color = Color.Gray
+                    )
+                }
+
+            }
 
             TextField(
                 value = nombreEntrenamiento,
@@ -145,31 +202,33 @@ fun PaginaCategoriaEntrenamientos(
                     }
                 ),
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Black,
-                    unfocusedIndicatorColor = Color.Black,
+                    focusedIndicatorColor = Color.Gray,
+                    unfocusedIndicatorColor = Color.Gray,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black,
-                    focusedLabelColor = Color.Black,
-                    unfocusedLabelColor = Color.Black
+                    focusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = Color.Gray,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
                 )
             )
 
-            Text(
-                text = "Categoría: ${categoriaSeleccionada ?: "No seleccionada"}\nSubcategoría: ${subcategoriaSeleccionada ?: "No seleccionada"}",
-                color = Color.Black,
-                modifier = Modifier.padding(10.dp)
-            )
+            Spacer(modifier = Modifier.height(5.dp))
 
             Button(
                 onClick = { mostrarLista = !mostrarLista },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
-                shape = RoundedCornerShape(3.dp)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(95, 95, 95),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(5.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 80.dp)
             ) {
                 Text(text = "Categorías")
             }
 
             if (caracteristicasEntrenamientos.isNotEmpty() && mostrarLista) {
-                LazyColumn {
+                LazyColumn() {
                     items(caracteristicasEntrenamientos) { entrenamiento ->
                         EntrenamientosCardExpandible(
                             caracteristicas = entrenamiento,
@@ -182,6 +241,12 @@ fun PaginaCategoriaEntrenamientos(
                 }
             }
 
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(text = "Numero de series", color = Color.Gray)
+
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(text = "Numero de repeticiones", color = Color.Gray)
+
             SelectorDiasSemana(
                 diasIniciales = diasSeleccionados,
                 onDiasSeleccionadosChange = { nuevosDias ->
@@ -192,36 +257,54 @@ fun PaginaCategoriaEntrenamientos(
                 }
             )
 
-            Divider(modifier = Modifier.padding(vertical = 10.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
-            Text("Rutinas archivadas:", color = Color.Black)
-
-            LazyColumn(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .weight(1f)
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
+                    .background(Color(44, 44, 44))
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                items(listaEjercicios) { rutina ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F7FA))
-                    ) {
-                        Column(modifier = Modifier.padding(10.dp)) {
-                            Text("Nombre: ${rutina["nombreEntrenamiento"]}")
-                            Text("Categoría: ${rutina["categoria"]}")
-                            Text("Subcategoría: ${rutina["subcategoria"]}")
-                            Text("Días: ${(rutina["dias"] as List<String>).joinToString(", ")}")
+                Spacer(modifier = Modifier.height(15.dp))
+                Text("Rutinas archivadas", color = Color.White)
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .weight(1f)
+                ) {
+                    items(listaEjercicios) { rutina ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .border(1.dp, Color(145, 145, 145), RoundedCornerShape(15.dp)),
+                            shape = RoundedCornerShape(15.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(240, 240, 240))
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text(
+                                    "Nombre: ${rutina["nombreEntrenamiento"]}",
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text("Categoría: ${rutina["categoria"]}", color = Color.Black)
+                                Text("Subcategoría: ${rutina["subcategoria"]}", color = Color.Black)
+                                Text(
+                                    "Días: ${(rutina["dias"] as List<*>).joinToString(", ")}",
+                                    color = Color.Black
+                                )
+                            }
                         }
                     }
                 }
             }
         }
     }
-} // Fin PaginaCategoriaEntrenamientos
+}
 
 @Composable
 fun EntrenamientosCardExpandible(
@@ -232,21 +315,20 @@ fun EntrenamientosCardExpandible(
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(5.dp),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp),
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Button(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 80.dp),
                 onClick = { expanded = !expanded },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(130, 168, 199)),
-                shape = RoundedCornerShape(3.dp)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(212, 172, 13 )),
+                shape = RoundedCornerShape(5.dp)
             ) {
                 Text(
                     text = caracteristicas.nombre ?: "Nombre desconocido",
@@ -257,12 +339,13 @@ fun EntrenamientosCardExpandible(
             if (expanded) {
                 caracteristicas.subcategorias?.forEach { subcategoria ->
                     Button(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 80.dp),
                         onClick = {
                             onSeleccionar(caracteristicas.nombre ?: "Desconocido", subcategoria)
                             expanded = false
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(193, 221, 245)),
-                        shape = RoundedCornerShape(3.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(249, 231, 159 )),
+                        shape = RoundedCornerShape(5.dp)
                     ) {
                         Text(
                             text = subcategoria,
@@ -285,42 +368,44 @@ fun SelectorDiasSemana(
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "Selecciona los días para este entrenamiento:",
-            color = Color.White,
+            text = "Días para entrenar",
+            color = Color.Gray,
             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+                .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
-            diasSemana.forEach { dia ->
-                val estaSeleccionado = diasSeleccionados.contains(dia)
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { // controla espacio entre letras
+                diasSemana.forEach { dia ->
+                    val estaSeleccionado = diasSeleccionados.contains(dia)
 
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = if (estaSeleccionado) Color(0xFF4CAF50) else Color.Gray,
-                            shape = RoundedCornerShape(20.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .background(
+                                color = if (estaSeleccionado) Color(0xFF4CAF50) else Color.Gray,
+                                shape = RoundedCornerShape(5.dp)
+                            )
+                            .clickable {
+                                diasSeleccionados = if (estaSeleccionado)
+                                    diasSeleccionados - dia
+                                else
+                                    diasSeleccionados + dia
+
+                                onDiasSeleccionadosChange(diasSeleccionados)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = dia,
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodySmall
                         )
-                        .clickable {
-                            diasSeleccionados = if (estaSeleccionado)
-                                diasSeleccionados - dia
-                            else
-                                diasSeleccionados + dia
-
-                            onDiasSeleccionadosChange(diasSeleccionados)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = dia,
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    }
                 }
             }
         }

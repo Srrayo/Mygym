@@ -89,7 +89,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("tabRowPantallas"){
+                        composable("tabRowPantallas") {
                             TabRowPantallas(
                                 navController = navController,
                                 dataUserViewModel = dataUserViewModel,

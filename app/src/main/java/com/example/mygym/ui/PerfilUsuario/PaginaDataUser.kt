@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -105,10 +106,12 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
         Card(
             modifier = Modifier
                 .fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(0.dp)
         ) {
             Column(
                 modifier = Modifier
+                    .background(Color.White)
                     .padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -167,9 +170,16 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
                             modifier = Modifier
                                 .width(100.dp) // Cambia 15.dp a un valor más razonable
                                 .height(36.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(
+                                    72, 201, 176
+                                ),
+                            ),
+                            shape = RoundedCornerShape(5.dp)
                         ) {
                             Text("Guardar", color = Color.White, fontSize = 12.sp)
                         }
+
 
                         Spacer(modifier = Modifier.width(5.dp))
 
@@ -179,7 +189,7 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
                                 onEditarCambiar(false)
                             },
                             modifier = Modifier
-                                .width(100.dp) // Cambia 15.dp a un valor más razonable
+                                .width(100.dp)
                                 .height(36.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(
@@ -187,7 +197,8 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
                                     89,
                                     89
                                 ),
-                            )
+                            ),
+                            shape = RoundedCornerShape(5.dp)
                         ) {
                             Text("Cancelar", color = Color.White, fontSize = 12.sp)
                         }
@@ -200,17 +211,20 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(32, 32, 32))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
-    ){
+    ) {
         CerrarVentana(navController)
         Spacer(modifier = Modifier.height(15.dp))
+
+
         Card(
             modifier = Modifier
                 .fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.Gray)
-        ){
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -225,7 +239,9 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
                     valorOriginal = usuario.nombre,
                     isEditing = campoEditando == "nombre",
                     onGuardar = { saveNombre() },
-                    onEditarCambiar = { editando -> campoEditando = if (editando) "nombre" else null }
+                    onEditarCambiar = { editando ->
+                        campoEditando = if (editando) "nombre" else null
+                    }
                 )
 
                 CampoEditable(
@@ -235,7 +251,9 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
                     valorOriginal = usuario.apellidos,
                     isEditing = campoEditando == "apellidos",
                     onGuardar = { saveApellidos() },
-                    onEditarCambiar = { editando -> campoEditando = if (editando) "apellidos" else null }
+                    onEditarCambiar = { editando ->
+                        campoEditando = if (editando) "apellidos" else null
+                    }
                 )
 
                 CampoEditable(
@@ -265,7 +283,9 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
                     valorOriginal = usuario.altura,
                     isEditing = campoEditando == "altura",
                     onGuardar = { saveAltura() },
-                    onEditarCambiar = { editando -> campoEditando = if (editando) "altura" else null }
+                    onEditarCambiar = { editando ->
+                        campoEditando = if (editando) "altura" else null
+                    }
                 )
 
                 CampoEditable(

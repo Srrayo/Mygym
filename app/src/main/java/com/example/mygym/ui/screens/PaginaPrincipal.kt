@@ -60,51 +60,47 @@ fun PaginaPrincipal(
             mostrarMensaje = true
         }
     }
-
-    MenuLateral(navController) { innerPadding ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+//            HeaderPaginaPrincipal(navController, viewModel, viewModelCaracteristicas, dataUserViewModel, calendarViewModel)
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(Color(236, 240, 241)),
+            contentAlignment = Alignment.Center
         ) {
-            HeaderPaginaPrincipal(navController, viewModel, viewModelCaracteristicas, dataUserViewModel, calendarViewModel)
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                when {
-                    rutinasGuardadas.isNotEmpty() -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp)
-                        ) {
-                            items(rutinasGuardadas) { rutina ->
-                                RutinaCard(rutina)
-                            }
+            when {
+                rutinasGuardadas.isNotEmpty() -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        items(rutinasGuardadas) { rutina ->
+                            RutinaCard(rutina)
                         }
                     }
+                }
 
-                    mostrarMensaje -> {
-                        Text(
-                            text = "No hay entrenamientos disponibles",
-                            color = Color.Black,
-                            fontSize = 18.sp
-                        )
-                    }
+                mostrarMensaje -> {
+                    Text(
+                        text = "No hay entrenamientos disponibles",
+                        color = Color.Black,
+                        fontSize = 18.sp
+                    )
+                }
 
-                    else -> {
-                        CircularProgressIndicator(color = Color.Gray)
-                    }
+                else -> {
+                    CircularProgressIndicator(color = Color.Gray)
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun RutinaCard(rutina: DataClassCaracteristicasEntrenamientos) {

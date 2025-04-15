@@ -91,7 +91,7 @@ fun HeaderPaginaPrincipal(
     viewModel: MainViewModel,
     viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
     dataUserViewModel: DataUserViewModel,
-    calendarViewModel: CalendarViewModel
+    calendarViewModel: CalendarViewModel,
 ) {
     val user = FirebaseAuth.getInstance().currentUser
     val userId = user?.uid ?: return
@@ -105,16 +105,14 @@ fun HeaderPaginaPrincipal(
     }
 
     Column(
-        modifier = Modifier
-            .background(Color.Black)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        Modifier
+            .background(Color(44, 44, 44))
+            .padding(16.dp), Arrangement.Center, Alignment.CenterHorizontally
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Black),
+                .background(Color(44, 44, 44)),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -141,6 +139,7 @@ fun HeaderPaginaPrincipal(
             Text(text = "25", color = Color.White, fontSize = 30.sp)
         }
         Spacer(modifier = Modifier.height(30.dp))
+//        TabRowPantallas(navController,viewModel,viewModelCaracteristicas,dataUserViewModel,calendarViewModel)
     }
 }
 // -- ↑ Logo e info del usuario ↑ ---------------------------------------------------------------------------
@@ -179,7 +178,7 @@ fun HeaderPaginaEntrenamiento(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(R.drawable.logob),
+                painter = painterResource(R.drawable.logongro),
                 contentDescription = "logo",
                 modifier = Modifier
                     .size(100.dp)
@@ -195,10 +194,10 @@ fun HeaderPaginaEntrenamiento(
         ) {
             Text(
                 text = "Hola, $nombre",
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 30.sp
             )
-            Text(text = "25", color = Color.White, fontSize = 30.sp)
+            Text(text = "25", color = Color.Black, fontSize = 30.sp)
         }
         Spacer(modifier = Modifier.height(30.dp))
     }
@@ -335,6 +334,7 @@ fun MenuLateral(
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
+                        .background(Color.Transparent)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center

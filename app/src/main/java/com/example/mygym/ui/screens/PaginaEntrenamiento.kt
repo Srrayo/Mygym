@@ -74,56 +74,46 @@ fun PaginaEntrenamiento(
             mostrarMensaje = true
         }
     }
-    MenuLateral(navController) { innerPadding ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(236, 240, 241)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        CrearNuevoEntreanmiento(navController)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+                .fillMaxWidth()
+                .background(Color(236, 240, 241)),
+            contentAlignment = Alignment.Center
         ) {
-            HeaderPaginaPrincipal(
-                navController,
-                viewModel,
-                viewModelCaracteristicas,
-                dataUserViewModel,
-                calendarViewModel
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CrearNuevoEntreanmiento(navController)
-            Spacer(modifier = Modifier.height(16.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-
-                when {
-                    rutinasGuardadas.isNotEmpty() -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp)
-                        ) {
-                            items(rutinasGuardadas) { rutina ->
-                                RutinaCardEntrenamiento(rutina)
-                            }
+            when {
+                rutinasGuardadas.isNotEmpty() -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        items(rutinasGuardadas) { rutina ->
+                            RutinaCardEntrenamiento(rutina)
                         }
                     }
+                }
 
-                    mostrarMensaje -> {
-                        Text(
-                            text = "No hay entrenamientos disponibles",
-                            color = Color.Black,
-                            fontSize = 18.sp
-                        )
-                    }
+                mostrarMensaje -> {
+                    Text(
+                        text = "No hay entrenamientos disponibles",
+                        color = Color.Black,
+                        fontSize = 18.sp
+                    )
+                }
 
-                    else -> {
-                        CircularProgressIndicator(color = Color.Gray)
-                    }
+                else -> {
+                    CircularProgressIndicator(color = Color.Gray)
                 }
             }
         }
@@ -137,16 +127,16 @@ fun CrearNuevoEntreanmiento(navController: NavController) {
     Button(
         onClick = { navController.navigate("categoriaEntrenamientos") },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF4CAF50), // Verde brillante
-            contentColor = Color.White // Color blanco para el texto
+            containerColor = Color(244, 208, 63),
+            contentColor = Color.White
         ),
+        shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .height(80.dp)
             .fillMaxWidth()
             .padding(16.dp)
-            .clip(RoundedCornerShape(50.dp)) // Forma de píldora para bordes más suaves
-            .shadow(4.dp, RoundedCornerShape(50.dp)), // Sombra para darle profundidad
-        shape = RoundedCornerShape(50.dp) // Píldora
+            .clip(RoundedCornerShape(10.dp))
+            .shadow(10.dp, RoundedCornerShape(10.dp))
     ) {
         Text(
             text = "Crea un nuevo entrenamiento",
