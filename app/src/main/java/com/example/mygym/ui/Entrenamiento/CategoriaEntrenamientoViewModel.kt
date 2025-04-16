@@ -105,6 +105,9 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         subcategoria: String,
         nombreEntrenamiento: String,
         diasSeleccionados: Set<String>,
+        descanso: Int,
+        repeticiones: Int,
+        series: Int,
         bloqueTimestamp: Long,
         rutinaIndex: Int
     ) {
@@ -117,7 +120,10 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                     "nombreEntrenamiento" to nombreEntrenamiento,
                     "categoria" to categoria,
                     "subcategoria" to subcategoria,
-                    "dias" to diasSeleccionados.toList()  // Convirtiendo el set a lista
+                    "dias" to diasSeleccionados.toList(),  // Convirtiendo el set a lista
+                    "descanso" to descanso,
+                    "repeticones" to repeticiones,
+                    "series" to series
                 )
 
                 // Usando un identificador único para el bloque de entrenamiento

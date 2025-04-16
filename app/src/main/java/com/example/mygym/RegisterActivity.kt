@@ -323,6 +323,9 @@ fun registrarUsuario(
                         ),
                         "Fuerza" to listOf("Peso libre", "Máquinas", "Calistenia")
                     ),
+                    "Series" to 0,
+                    "Repeticiones" to 0,
+                    "Descanso" to 0,
                     "seleccionados" to listOf<String>()
                 )
 
