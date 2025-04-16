@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -81,23 +82,31 @@ fun PaginaCategoriaEntrenamientos(
             ) {
                 Button(
                     onClick = {
-                        if (categoriaSeleccionada != null && subcategoriaSeleccionada != null) {
+                        if ( categoriaSeleccionada != null &&
+                            subcategoriaSeleccionada != null &&
+                            diasSeleccionados.isNotEmpty() &&
+                            series.value > 0 &&
+                            repeticiones.value > 0 &&
+                            descanso.value > 0) {
                             val nuevoEjercicio = mapOf(
                                 "nombreEntrenamiento" to nombreEntrenamiento,
                                 "categoria" to categoriaSeleccionada!!,
                                 "subcategoria" to subcategoriaSeleccionada!!,
-                                "dias" to diasSeleccionados.toList()
+                                "dias" to diasSeleccionados.toList(),
+                                "series" to series.value,
+                                "repeticiones" to repeticiones.value,
+                                "descanso" to descanso.value
                             )
                             listaEjercicios.add(nuevoEjercicio)
 
                             categoriaSeleccionada = null
                             subcategoriaSeleccionada = null
 
-                            Toast.makeText(context, "Ejercicio añadido", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Ejercicio añadido ✔\uFE0F", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(
                                 context,
-                                "Selecciona categoría y subcategoría",
+                                "Rellene todos los campos ⚠\uFE0F",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -160,151 +169,172 @@ fun PaginaCategoriaEntrenamientos(
             }
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(236, 240, 241))
                 .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            CerrarVentana(navController)
-
-            Row(modifier = Modifier.padding(10.dp)) {
-                Column() {
-                    Text(
-                        text = "Categoría: ",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = categoriaSeleccionada ?: "No seleccionada",
-                        color = Color.Gray
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(20.dp))
-
-                Column() {
-                    Text(
-                        text = "Subcategoría: ",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = subcategoriaSeleccionada ?: "No seleccionada",
-                        color = Color.Gray
-                    )
-                }
-
+            item {
+                CerrarVentana(navController)
             }
 
-            TextField(
-                value = nombreEntrenamiento,
-                onValueChange = {
-                    nombreEntrenamiento = it
-                    // Sincroniza nombre con todos los ejercicios en lista
-                    listaEjercicios.replaceAll { ejercicio ->
-                        ejercicio.toMutableMap().apply { this["nombreEntrenamiento"] = it }
-                    }
-                },
-                label = { Text(text = "Nombre del entrenamiento") },
-                modifier = Modifier.width(250.dp),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                    }
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Gray,
-                    unfocusedIndicatorColor = Color.Gray,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedLabelColor = Color.Gray,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
-                )
-            )
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "Categoría: ",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = categoriaSeleccionada ?: "No seleccionada",
+                                color = Color.Gray
+                            )
+                        }
 
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Button(
-                onClick = { mostrarLista = !mostrarLista },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(95, 95, 95),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(5.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 80.dp)
-            ) {
-                Text(text = "Categorías")
-            }
-
-            if (caracteristicasEntrenamientos.isNotEmpty() && mostrarLista) {
-                LazyColumn() {
-                    items(caracteristicasEntrenamientos) { entrenamiento ->
-                        EntrenamientosCardExpandible(
-                            caracteristicas = entrenamiento,
-                            onSeleccionar = { categoria, subcategoria ->
-                                categoriaSeleccionada = categoria
-                                subcategoriaSeleccionada = subcategoria
-                            }
-                        )
+                        Column {
+                            Text(
+                                text = "Subcategoría: ",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = subcategoriaSeleccionada ?: "No seleccionada",
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
             }
 
 
-            Column(
-                modifier = Modifier
-                    .verticalScroll(scrollState)
-            ) {
-                ControlConBoton(
-                    caracteristica = "series",
-                    titulo = "Número de series",
-                    valor = series.value,
-                    onValueChange = { series.value = it },
-                    showInput = showSeriesInput,
-                    onToggleInput = { showSeriesInput = !showSeriesInput }
-                )
-
-                ControlConBoton(
-                    caracteristica = "repeticiones",
-                    titulo = "Número de repeticiones",
-                    valor = repeticiones.value,
-                    onValueChange = { repeticiones.value = it },
-                    showInput = showRepeticionesInput,
-                    onToggleInput = { showRepeticionesInput = !showRepeticionesInput }
-                )
-
-                ControlConBoton(
-                    caracteristica = "segundos",
-                    titulo = "Descanso entre series",
-                    valor = descanso.value,
-                    onValueChange = { descanso.value = it },
-                    showInput = showDescansoInput,
-                    onToggleInput = { showDescansoInput = !showDescansoInput }
+            item {
+                TextField(
+                    value = nombreEntrenamiento,
+                    onValueChange = {
+                        nombreEntrenamiento = it
+                        listaEjercicios.replaceAll { ejercicio ->
+                            ejercicio.toMutableMap().apply { this["nombreEntrenamiento"] = it }
+                        }
+                    },
+                    label = { Text(text = "Nombre del entrenamiento") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 50.dp), // Aseguramos que el TextField esté centrado
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.Gray,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedLabelColor = Color.Gray,
+                        unfocusedLabelColor = Color.Gray,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent
+                    )
                 )
             }
 
-            SelectorDiasSemana(
-                diasIniciales = diasSeleccionados,
-                onDiasSeleccionadosChange = { nuevosDias ->
-                    diasSeleccionados = nuevosDias
-                    listaEjercicios.replaceAll { ejercicio ->
-                        ejercicio.toMutableMap().apply { this["dias"] = nuevosDias.toList() }
-                    }
+            item {
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Button(
+                    onClick = {
+                        mostrarLista = !mostrarLista // Cambia el estado al hacer clic
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(95, 95, 95),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 80.dp)
+                ) {
+                    Text(text = if (mostrarLista) "Ocultar Categorías" else "Mostrar Categorías")
                 }
-            )
+            }
 
-            Spacer(modifier = Modifier.height(15.dp))
+            // Mostramos la lista solo si mostrarLista es true
+            if (mostrarLista) {
+                items(caracteristicasEntrenamientos) { entrenamiento ->
+                    EntrenamientosCardExpandible(
+                        caracteristicas = entrenamiento,
+                        onSeleccionar = { categoria, subcategoria ->
+                            categoriaSeleccionada = categoria
+                            subcategoriaSeleccionada = subcategoria
+                        }
+                    )
+                }
+            }
 
-            RutinasArchivadas(listaEjercicios)
+            item {
+                Column {
+                    ControlConBoton(
+                        caracteristica = "series",
+                        titulo = "Número de series",
+                        valor = series.value,
+                        onValueChange = { series.value = it },
+                        showInput = showSeriesInput,
+                        onToggleInput = { showSeriesInput = !showSeriesInput }
+                    )
+
+                    ControlConBoton(
+                        caracteristica = "repeticiones",
+                        titulo = "Número de repeticiones",
+                        valor = repeticiones.value,
+                        onValueChange = { repeticiones.value = it },
+                        showInput = showRepeticionesInput,
+                        onToggleInput = { showRepeticionesInput = !showRepeticionesInput }
+                    )
+
+                    ControlConBoton(
+                        caracteristica = "segundos",
+                        titulo = "Descanso entre series",
+                        valor = descanso.value,
+                        onValueChange = { descanso.value = it },
+                        showInput = showDescansoInput,
+                        onToggleInput = { showDescansoInput = !showDescansoInput }
+                    )
+                }
+            }
+
+            item {
+                SelectorDiasSemana(
+                    diasIniciales = diasSeleccionados,
+                    onDiasSeleccionadosChange = { nuevosDias ->
+                        diasSeleccionados = nuevosDias
+                        listaEjercicios.replaceAll { ejercicio ->
+                            ejercicio.toMutableMap().apply { this["dias"] = nuevosDias.toList() }
+                        }
+                    }
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                RutinasArchivadas(listaEjercicios)
+            }
         }
     }
+
 }
 
 @Composable
@@ -371,7 +401,7 @@ fun SelectorDiasSemana(
         Text(
             text = "Días para entrenar",
             color = Color.Gray,
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
         )
 
         Row(
@@ -453,8 +483,8 @@ fun ControlConBoton(
 ) {
     var mensajeGuardado by remember { mutableStateOf<String?>(null) }
     val rango = when (caracteristica) {
-        "segundos" -> 0..300
-        else -> 0..100
+        "segundos" -> 1..300
+        else -> 1..100
     }
 
     LaunchedEffect(mensajeGuardado) {
@@ -503,7 +533,7 @@ fun ControlConBoton(
         }
 
         if (mensajeGuardado != null) {
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = mensajeGuardado!!,
                 color = Color(0xFF4CAF50),
@@ -516,26 +546,30 @@ fun ControlConBoton(
 
 @Composable
 fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
-    var offsetY by remember { mutableStateOf(30.dp) }  // Desplazamiento inicial
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val desplazamiento = 0.dp // Queremos desplazarlo 200.dp
+    var offsetY by remember { mutableStateOf((-200).dp) } // Empieza a los 100.dp (parte visible)
+    var expanded by remember { mutableStateOf(false) } // Estado de expansión
+    val offsetAnimado by animateDpAsState(targetValue = offsetY, label = "")
 
-    val offsetAnimado by animateDpAsState(targetValue = offsetY)
-
-    // Añadimos un gesto clickable para levantar la columna al tocarla
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .offset(y = offsetAnimado)  // Se mueve la columna hacia arriba con el offset
-            .clip(RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
+            .fillMaxWidth()
+            .height(250.dp) // Fijamos la altura total a 300.dp
+            .offset(y = -offsetAnimado) // Desplazamos 200.dp hacia arriba
+            .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
             .background(Color(44, 44, 44))
-            .padding(16.dp)
             .clickable {
-                // Cambia el valor del offset para desplazar la columna hacia arriba
-                offsetY = if (offsetY == 30.dp) 0.dp else 30.dp  // Alterna el desplazamiento
+                // Al hacer clic, alternamos el estado de expansión
+                expanded = !expanded
+                // Ajustamos el desplazamiento de 100.dp a 200.dp
+                offsetY = if (expanded) desplazamiento else (-200).dp
             },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         Text("Rutinas archivadas", color = Color.White)
 
         LazyColumn(
@@ -550,6 +584,9 @@ fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
         }
     }
 }
+
+
+
 
 
 
