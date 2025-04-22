@@ -2,9 +2,11 @@ package com.example.mygym.ui.screens
 
 import CaracteristicasEntrenamientoViewModel
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,6 +70,7 @@ fun PaginaEntrenamiento(
 ) {
     val rutinasGuardadas by viewModelCaracteristicas.rutinasGuardadas.collectAsState()
     var mostrarMensaje by remember { mutableStateOf(false) }
+
     LaunchedEffect(rutinasGuardadas) {
         kotlinx.coroutines.delay(3000)
         if (rutinasGuardadas.isEmpty()) {
@@ -81,10 +84,10 @@ fun PaginaEntrenamiento(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         CrearNuevoEntreanmiento(navController)
-        Spacer(modifier = Modifier.height(16.dp))
-
+        Spacer(modifier = Modifier.height(5.dp))
+        Text("Editar entrenamientos")
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,8 +102,29 @@ fun PaginaEntrenamiento(
                         contentPadding = PaddingValues(16.dp)
                     ) {
                         items(rutinasGuardadas) { rutina ->
-                            RutinaCardEntrenamiento(rutina)
+                            RutinaCardEntrenamiento(rutina) {
+//                                navController.navigate("editarEntrenamiento/${rutina.bloqueId}/${rutina.nombreEntrenamiento}/${rutina.categoria}/${rutina.subcategorias}")
+
+//                                navController.navigate(
+//                                    "editarEntrenamiento/${rutina.bloqueId}/${rutina.nombreEntrenamiento}/${rutina.categoria}/${rutina.subcategorias}/${rutina.dias}/${rutina.descanso}/${rutina.repeticiones}/${rutina.series}"
+//                                )
+
+                                val bloqueId = rutina.bloqueId ?: ""
+                                val rutinaKey = "rutina_0" // Esto es un ejemplo, deberías obtenerlo dinámicamente si hay más de una rutina
+                                val nombreEntrenamiento = rutina.nombreEntrenamiento ?: ""
+                                val categoria = rutina.categoria ?: ""
+                                val subcategoria = rutina.subcategorias?.firstOrNull() ?: ""
+                                val dias = rutina.dias ?: emptyList()
+                                val descanso = rutina.descanso
+                                val repeticiones = rutina.repeticiones
+                                val series = rutina.series
+
+                                navController.navigate(
+                                    "editar_ejercicio/${bloqueId}/${rutinaKey}/${nombreEntrenamiento}/${categoria}/${subcategoria}/${dias.joinToString(",")}/${descanso}/${repeticiones}/${series}"
+                                )
+                            }
                         }
+
                     }
                 }
 
@@ -182,14 +206,6 @@ fun CardEntrenamientos2(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            /**
-             * Text(
-             *                 text = entrenamiento.nombre,
-             *                 style = TextStyle(fontSize = 15.sp, color = Color.White),
-             *                 modifier = Modifier.padding(start = 16.dp)
-             *             )
-             */
-
             Button(
                 modifier = Modifier.padding(end = 15.dp),
                 onClick = { navController.navigate("edicionEntrenamiento") },
@@ -207,97 +223,36 @@ fun CardEntrenamientos2(
     }
 }
 
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun Calendario(
-//    onDateSelected: (String) -> Unit
-//) {
-//    val datePickerState = rememberDatePickerState()
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(16.dp)
-//    ) {
-//        // Título del calendario
-//        Text(
-//            text = "Selecciona una fecha",
-//            style = MaterialTheme.typography.titleMedium
-//        )
-//
-//        // DatePicker mostrando el calendario
-//        DatePicker(
-//            state = datePickerState,
-//            headline = {
-//                Text("Fecha seleccionada: ${datePickerState.selectedDateMillis?.let { formatDate(it) } ?: "Ninguna"}")
-//            },
-//            showModeToggle = true // Permite cambiar entre la vista de calendario y entrada manual
-//        )
-//
-//        // Botón para confirmar la selección de fecha
-//        Spacer(modifier = Modifier.height(16.dp))
-//        Button(
-//            onClick = {
-//                val selectedDateMillis = datePickerState.selectedDateMillis
-//                selectedDateMillis?.let {
-//                    onDateSelected(formatDate(it))
-//                }
-//            },
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Text("Confirmar")
-//        }
-//    }
-//}
-
-
 @Composable
-fun RutinaCardEntrenamiento(rutina: DataClassCaracteristicasEntrenamientos) {
+fun RutinaCardEntrenamiento(rutina: DataClassCaracteristicasEntrenamientos, onClick: () -> Unit) {
+    Log.d("Debug", "Rutina: $rutina, Categoria: ${rutina.categoria}, Nombre: ${rutina.nombreEntrenamiento}")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(3.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            // horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
-                modifier = Modifier
-                    .padding(10.dp),
-                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Text(
                     text = rutina.nombreEntrenamiento ?: "Nombre desconocido",
-                    color = Color.Black,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
                 Text(
-                    text = rutina.nombreEntrenamiento ?: "Rutina desconocida",
-                    color = Color.DarkGray,
-                    style = TextStyle(fontSize = 17.sp)
+                    text = "Categoría: ${rutina.categoria ?: "Desconocida"}", // Asegúrate de que "categoria" no esté vacío
+                    style = TextStyle(fontSize = 14.sp)
                 )
             }
-
-
-//            rutina.subcategorias?.forEach { subcategoria ->
-//                Text(
-//                    text = "• $subcategoria",
-//                    color = Color.DarkGray,
-//                    fontSize = 16.sp
-//                )
-//            }
         }
     }
 }
+
 
 

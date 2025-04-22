@@ -115,7 +115,7 @@ fun PaginaCategoriaEntrenamientos(
                         contentColor = Color.White,
                     ),
                     shape = RoundedCornerShape(5.dp),
-                    modifier = Modifier.padding(bottom = 15.dp)
+                    modifier = Modifier.padding(bottom = 15.dp, top = 15.dp, start = 15.dp)
                 ) {
                     Text("Añadir nuevo")
                 }
@@ -161,10 +161,10 @@ fun PaginaCategoriaEntrenamientos(
                         containerColor = Color.White,
                         contentColor = Color.Black
                     ),
-                    modifier = Modifier.padding(bottom = 15.dp),
+                    modifier = Modifier.padding(bottom = 15.dp, top = 15.dp, end = 15.dp),
                     shape = RoundedCornerShape(5.dp)
                 ) {
-                    Text("Guardar entrenamiento")
+                    Text("Guardar")
                 }
             }
         }
@@ -518,7 +518,7 @@ fun ControlConBoton(
         Button(
             onClick = {
                 if (showInput) {
-                    mensajeGuardado = "✔ $titulo guardado correctamente"
+                    mensajeGuardado = "$titulo guardado correctamente"
                 }
                 onToggleInput()
             },
@@ -549,7 +549,7 @@ fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val desplazamiento = 0.dp // Queremos desplazarlo 200.dp
-    var offsetY by remember { mutableStateOf((-200).dp) } // Empieza a los 100.dp (parte visible)
+    var offsetY by remember { mutableStateOf((-210).dp) } // Empieza a los 100.dp (parte visible)
     var expanded by remember { mutableStateOf(false) } // Estado de expansión
     val offsetAnimado by animateDpAsState(targetValue = offsetY, label = "")
 
@@ -564,7 +564,7 @@ fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
                 // Al hacer clic, alternamos el estado de expansión
                 expanded = !expanded
                 // Ajustamos el desplazamiento de 100.dp a 200.dp
-                offsetY = if (expanded) desplazamiento else (-200).dp
+                offsetY = if (expanded) desplazamiento else (-210).dp
             },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -586,10 +586,6 @@ fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
 }
 
 
-
-
-
-
 @Composable
 fun RutinaCardArchivada(rutina: Map<String, Any>) {
     var expanded by remember { mutableStateOf(false) }
@@ -608,16 +604,20 @@ fun RutinaCardArchivada(rutina: Map<String, Any>) {
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
             // Muestra el nombre de la rutina
-            Text(
-                "Nombre: ${rutina["nombreEntrenamiento"]}",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-
+            Column(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                Text(
+                    "◆ ${rutina["nombreEntrenamiento"]} ◆",
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
             // Si está expandido, muestra los detalles adicionales
             if (expanded) {
                 Text("Categoría: ${rutina["categoria"]}", color = Color.Black)
                 Text("Subcategoría: ${rutina["subcategoria"]}", color = Color.Black)
+                Text("Número de series:  ${rutina["series"]}", color = Color.Black)
+                Text("Numero de repeticiones: ${rutina["repeticiones"]}", color = Color.Black)
+                Text("Descanso entre series: ${rutina["descanso"]}", color = Color.Black)
                 Text(
                     "Días: ${(rutina["dias"] as? List<*>)?.joinToString(", ") ?: ""}",
                     color = Color.Black
@@ -626,10 +626,3 @@ fun RutinaCardArchivada(rutina: Map<String, Any>) {
         }
     }
 }
-
-
-
-
-
-
-

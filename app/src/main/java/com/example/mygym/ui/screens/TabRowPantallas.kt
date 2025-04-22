@@ -37,7 +37,8 @@ fun TabRowPantallas(
     viewModel: MainViewModel,
     viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
     dataUserViewModel: DataUserViewModel,
-    calendarViewModel: CalendarViewModel
+    calendarViewModel: CalendarViewModel,
+
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Inicio", "Entrenamientos", "Calendario")

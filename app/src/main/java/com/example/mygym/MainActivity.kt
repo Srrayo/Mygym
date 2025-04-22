@@ -8,11 +8,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mygym.model.CalendarViewModel
+import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.example.mygym.model.MainViewModel
+import com.example.mygym.ui.EditarEntrenamiento.EditarEntrenamientoViewModel
+import com.example.mygym.ui.EditarEntrenamiento.PantallaEdicionEjercicio
+//import com.example.mygym.ui.EditarEntrenamiento.PantallaEdicionEntrenamiento
 import com.example.mygym.ui.screens.EdicionEntrenamiento
 import com.example.mygym.ui.screens.PaginaCalendario
 import com.example.mygym.ui.Entrenamiento.PaginaCategoriaEntrenamientos
@@ -37,6 +43,7 @@ class MainActivity : ComponentActivity() {
                 val calendarViewModel: CalendarViewModel = viewModel()
                 val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
                 val dataUserViewModel: DataUserViewModel = viewModel()
+                val editarEntrenamientoViewModel: EditarEntrenamientoViewModel = viewModel()
                 NavHost(
                     navController = navController,
                     startDestination = "tabRowPantallas",
@@ -96,6 +103,50 @@ class MainActivity : ComponentActivity() {
                                 calendarViewModel = CalendarViewModel(),
                                 viewModelCaracteristicas = CaracteristicasEntrenamientoViewModel(),
                                 viewModel = mainViewModel
+                            )
+                        }
+
+                        composable(
+                            "editar_ejercicio/{bloqueId}/{rutinaKey}/{nombreEntrenamiento}/{categoria}/{subcategoria}/{dias}/{descanso}/{repeticiones}/{series}",
+                            arguments = listOf(
+                                navArgument("bloqueId") { type = NavType.StringType },
+                                navArgument("rutinaKey") { type = NavType.StringType },
+                                navArgument("nombreEntrenamiento") { type = NavType.StringType },
+                                navArgument("categoria") { type = NavType.StringType },
+                                navArgument("subcategoria") { type = NavType.StringType },
+                                navArgument("dias") { type = NavType.StringType },
+                                navArgument("descanso") { type = NavType.IntType },
+                                navArgument("repeticiones") { type = NavType.IntType },
+                                navArgument("series") { type = NavType.IntType }
+                            )
+                        ) { backStackEntry ->
+                            val bloqueId = backStackEntry.arguments?.getString("bloqueId") ?: ""
+                            val rutinaKey = backStackEntry.arguments?.getString("rutinaKey") ?: ""
+                            val nombre = backStackEntry.arguments?.getString("nombreEntrenamiento") ?: ""
+                            val categoria = backStackEntry.arguments?.getString("categoria") ?: ""
+                            val subcategoria = backStackEntry.arguments?.getString("subcategoria") ?: ""
+                            val dias = backStackEntry.arguments?.getString("dias")?.split(",") ?: emptyList()
+                            val descanso = backStackEntry.arguments?.getInt("descanso") ?: 0
+                            val repeticiones = backStackEntry.arguments?.getInt("repeticiones") ?: 0
+                            val series = backStackEntry.arguments?.getInt("series") ?: 0
+
+                            val ejercicio = DataClassCaracteristicasEntrenamientos(
+                                nombre = null,
+                                subcategorias = listOf(subcategoria),
+                                nombreEntrenamiento = nombre,
+                                dias = dias,
+                                categoria = categoria,
+                                descanso = descanso,
+                                repeticiones = repeticiones,
+                                series = series,
+                                bloqueId = bloqueId
+                            )
+
+                            PantallaEdicionEjercicio(
+                                ejercicio = ejercicio,
+                                viewModel = CaracteristicasEntrenamientoViewModel(), // puedes pasar uno compartido si ya lo tienes arriba
+                                navController = navController,
+                                rutinaKey = rutinaKey
                             )
                         }
                     })

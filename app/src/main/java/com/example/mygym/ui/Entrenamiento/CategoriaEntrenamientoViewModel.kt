@@ -170,52 +170,6 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
     }
 
 
-
-//    fun getRutinasGuardadas(userId: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                val userDoc = db.collection("usuarios").document(userId).get().await()
-//                val rutinasGuardadasMap = userDoc.get("rutinasGuardadas") as? Map<*, *> ?: emptyMap<Any, Any>()
-//
-//                val rutinas = mutableListOf<DataClassCaracteristicasEntrenamientos>()
-//
-//                for ((_, bloque) in rutinasGuardadasMap) {
-//                    val bloqueMap = bloque as? Map<*, *> ?: continue
-//
-//                    for ((_, rutinaList) in bloqueMap) {
-//                        val rutinasDentro = rutinaList as? List<Map<String, Any>> ?: continue
-//
-//                        for (rutina in rutinasDentro) {
-//                            val categoria = rutina["categoria"] as? String
-//                            val subcategoria = rutina["subcategoria"] as? String
-//                            val nombre = rutina["nombreEntrenamiento"] as? String
-//                            val dias = rutina["dias"] as? List<String>
-//
-//                            if (categoria != null && subcategoria != null && nombre != null) {
-//                                rutinas.add(
-//                                    DataClassCaracteristicasEntrenamientos(
-//                                        nombre = categoria,
-//                                        subcategorias = listOf(subcategoria),
-//                                        nombreEntrenamiento = nombre,
-//                                        dias = dias,
-//                                        categoria = categoria
-//                                    )
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                _rutinasGuardadas.value = rutinas
-//                Log.d("FirestoreDebug", "Rutinas guardadas obtenidas: $rutinas")
-//            } catch (e: Exception) {
-//                Log.e("FirestoreDebug", "Error al obtener rutinas guardadas: ${e.message}")
-//            }
-//        }
-//    }
-
-
-
     fun getRutinasGuardadas(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -226,15 +180,17 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                     val firstRutina = rutinaSet.values.firstOrNull()?.firstOrNull()
                     firstRutina?.let { rutina ->
                         val nombre = rutina["nombreEntrenamiento"] as? String
+                        val categoria = rutina["categoria"] as? String
                         val subcategoria = rutina["subcategoria"] as? String
                         val dias = rutina["dias"] as? List<String>
                         if (nombre != null && subcategoria != null) {
                             DataClassCaracteristicasEntrenamientos(
                                 nombre = null,
+                                categoria = categoria,
                                 subcategorias = listOf(subcategoria),
                                 nombreEntrenamiento = nombre,
                                 dias = dias,
-                                categoria = bloqueId // Mostramos el bloque como referencia
+                                bloqueId = bloqueId
                             )
                         } else null
                     }
@@ -249,4 +205,50 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
+    fun actualizarEjercicio(
+        bloqueId: String,
+        rutinaKey: String,
+        ejercicioActual: DataClassCaracteristicasEntrenamientos,
+        nuevoNombre: String,
+        nuevaCategoria: String,
+        nuevaSubcategoria: String,
+        nuevosDias: List<String>,
+        nuevoDescanso: Int,
+        nuevasRepeticiones: Int,
+        nuevasSeries: Int
+    ) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val userDocRef = db.collection("usuarios").document(userId)
+                val snapshot = userDocRef.get().await()
+
+                val rutinas = snapshot.get("rutinasGuardadas") as? MutableMap<String, Any> ?: return@launch
+                val bloque = rutinas[bloqueId] as? MutableMap<String, Any> ?: return@launch
+                val ejercicioLista = bloque[rutinaKey] as? List<Map<String, Any>> ?: return@launch
+
+                if (ejercicioLista.isNotEmpty()) {
+                    val ejercicio = ejercicioLista[0]
+                    if (ejercicio["nombreEntrenamiento"] == ejercicioActual.nombreEntrenamiento) {
+                        val nuevoEjercicio = ejercicio.toMutableMap().apply {
+                            this["nombreEntrenamiento"] = nuevoNombre
+                            this["categoria"] = nuevaCategoria
+                            this["subcategoria"] = nuevaSubcategoria
+                            this["dias"] = nuevosDias
+                            this["descanso"] = nuevoDescanso
+                            this["repeticiones"] = nuevasRepeticiones
+                            this["series"] = nuevasSeries
+                        }
+
+                        bloque[rutinaKey] = listOf(nuevoEjercicio)
+                        userDocRef.set(mapOf("rutinasGuardadas" to rutinas), SetOptions.merge()).await()
+                        Log.d("Firestore", "Ejercicio actualizado correctamente.")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("Firestore", "Error actualizando ejercicio: ${e.message}")
+            }
+        }
+    }
 }
