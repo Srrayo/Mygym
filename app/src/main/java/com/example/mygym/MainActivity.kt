@@ -144,7 +144,7 @@ class MainActivity : ComponentActivity() {
 
                             PantallaEdicionEjercicio(
                                 ejercicio = ejercicio,
-                                viewModel = CaracteristicasEntrenamientoViewModel(), // puedes pasar uno compartido si ya lo tienes arriba
+                                viewModel = CaracteristicasEntrenamientoViewModel(),
                                 navController = navController,
                                 rutinaKey = rutinaKey
                             )
@@ -154,6 +154,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-

@@ -10,4 +10,5 @@ data class DataClassCaracteristicasEntrenamientos(
     val repeticiones: Int = 0,
     val series: Int = 0,
     val bloqueId: String? = null
+
 )
