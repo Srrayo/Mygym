@@ -60,10 +60,10 @@ class MainActivity : ComponentActivity() {
                         composable("paginaCrearEntrenamiento") {
                             PaginaEntrenamiento(
                                 navController = navController,
-                                viewModel = mainViewModel,
-                                calendarViewModel = CalendarViewModel(),
-                                viewModelCaracteristicas = CaracteristicasEntrenamientoViewModel(),
-                                dataUserViewModel = dataUserViewModel
+//                                viewModel = mainViewModel,
+//                                calendarViewModel = CalendarViewModel(),
+                                viewModel = CaracteristicasEntrenamientoViewModel(),
+//                                dataUserViewModel = dataUserViewModel
                             )
                         }
                         composable("paginaCalendario") {

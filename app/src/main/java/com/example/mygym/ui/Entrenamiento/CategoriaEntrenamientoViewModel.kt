@@ -170,40 +170,45 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
     }
 
 
-    fun getRutinasGuardadas(userId: String) {
+    private fun getRutinasGuardadas(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userDoc = db.collection("usuarios").document(userId).get().await()
                 val rutinasMap = userDoc.get("rutinasGuardadas") as? Map<String, Map<String, List<Map<String, Any>>>> ?: emptyMap()
 
-                val rutinas = rutinasMap.mapNotNull { (bloqueId, rutinaSet) ->
-                    val firstRutina = rutinaSet.values.firstOrNull()?.firstOrNull()
-                    firstRutina?.let { rutina ->
-                        val nombre = rutina["nombreEntrenamiento"] as? String
-                        val categoria = rutina["categoria"] as? String
-                        val subcategoria = rutina["subcategoria"] as? String
-                        val dias = rutina["dias"] as? List<String>
-                        if (nombre != null && subcategoria != null) {
-                            DataClassCaracteristicasEntrenamientos(
-                                nombre = null,
-                                categoria = categoria,
-                                subcategorias = listOf(subcategoria),
-                                nombreEntrenamiento = nombre,
-                                dias = dias,
-                                bloqueId = bloqueId
-                            )
-                        } else null
+                val rutinas = rutinasMap.flatMap { (bloqueId, rutinaSet) ->
+                    // Iterar sobre las rutinas dentro de cada bloque
+                    rutinaSet.values.flatMap { rutinaList ->
+                        rutinaList.mapNotNull { rutina ->
+                            val nombre = rutina["nombreEntrenamiento"] as? String
+                            val categoria = rutina["categoria"] as? String
+                            val subcategoria = rutina["subcategoria"] as? String
+                            val dias = rutina["dias"] as? List<String>
+
+                            // Crear un objeto DataClassCaracteristicasEntrenamientos para cada rutina
+                            if (nombre != null && subcategoria != null) {
+                                DataClassCaracteristicasEntrenamientos(
+                                    nombre = nombre,
+                                    categoria = categoria,
+                                    subcategorias = listOf(subcategoria),
+                                    nombreEntrenamiento = nombre,
+                                    dias = dias,
+                                    bloqueId = bloqueId
+                                )
+                            } else null
+                        }
                     }
                 }
 
                 _rutinasGuardadas.value = rutinas
-                Log.d("FirestoreDebug", "Rutinas cargadas (una por bloque): $rutinas")
+                Log.d("FirestoreDebug", "Rutinas cargadas: $rutinas")
 
             } catch (e: Exception) {
                 Log.e("FirestoreDebug", "Error al obtener rutinas guardadas: ${e.message}")
             }
         }
     }
+
 
 
     fun actualizarEjercicio(

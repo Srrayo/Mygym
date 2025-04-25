@@ -101,10 +101,10 @@ fun TabRowPantallas(
 
                 1 -> PaginaEntrenamiento(
                     navController,
-                    viewModel,
+//                    viewModel,
                     viewModelCaracteristicas,
-                    dataUserViewModel,
-                    calendarViewModel
+//                    dataUserViewModel,
+//                    calendarViewModel
                 )
 
                 2 -> PaginaCalendario(

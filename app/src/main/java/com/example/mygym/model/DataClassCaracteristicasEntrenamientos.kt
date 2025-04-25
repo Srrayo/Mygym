@@ -9,6 +9,6 @@ data class DataClassCaracteristicasEntrenamientos(
     val descanso: Int = 0,
     val repeticiones: Int = 0,
     val series: Int = 0,
-    val bloqueId: String? = null
-
+    val bloqueId: String? = null,
+    val rutinas: List<DataClassCaracteristicasEntrenamientos>? = null
 )

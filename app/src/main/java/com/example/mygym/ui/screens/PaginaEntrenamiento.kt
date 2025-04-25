@@ -47,28 +47,17 @@ import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.example.mygym.model.MainViewModel
 import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaginaEntrenamiento(
     navController: NavController,
-    viewModel: MainViewModel,
-    viewModelCaracteristicas: CaracteristicasEntrenamientoViewModel,
-    dataUserViewModel: DataUserViewModel,
-    calendarViewModel: CalendarViewModel
+    viewModel: CaracteristicasEntrenamientoViewModel
 ) {
-    val rutinasGuardadas by viewModelCaracteristicas.rutinasGuardadas.collectAsState()
-    var mostrarMensaje by remember { mutableStateOf(false) }
+    val rutinasGuardadas by viewModel.rutinasGuardadas.collectAsState()
 
-    // Agrupamos las rutinas por bloqueId
-    val rutinasPorBloque = rutinasGuardadas.groupBy { it.bloqueId ?: "Sin ID" }
+    // Agrupar las rutinas por bloque
+    val bloques = rutinasGuardadas.groupBy { it.bloqueId }
 
-    LaunchedEffect(rutinasGuardadas) {
-        kotlinx.coroutines.delay(3000)
-        if (rutinasGuardadas.isEmpty()) {
-            mostrarMensaje = true
-        }
-    }
-
+    // Mostramos los bloques y las rutinas dentro de cada bloque
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +65,6 @@ fun PaginaEntrenamiento(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(5.dp))
         CrearNuevoEntreanmiento(navController)
         Spacer(modifier = Modifier.height(5.dp))
         Text("Editar entrenamientos")
@@ -87,37 +75,29 @@ fun PaginaEntrenamiento(
                 .background(Color(236, 240, 241)),
             contentAlignment = Alignment.Center
         ) {
-            when {
-                rutinasGuardadas.isNotEmpty() -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp)
-                    ) {
-                        rutinasPorBloque.forEach { (bloqueId, rutinas) ->
-                            item {
-                                RutinaCardBloque(
-                                    bloqueId = bloqueId,
-                                    rutinas = rutinas,
-                                    onClickEditar = {
-                                        navController.navigate("editar_bloqueEntrenamiento/$bloqueId")
-                                    }
-                                )
+            if (bloques.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(bloques.keys.toList()) { bloqueId ->
+                        val rutinas = bloques[bloqueId] ?: emptyList()
+                        RutinaCardBloque(
+                            bloqueId = bloqueId ?: "Bloque desconocido",
+                            rutinas = rutinas,
+                            onClickEditar = {
+                                // Acción para editar el bloque o la rutina
+                                navController.navigate("editar_bloque/$bloqueId")
                             }
-                        }
+                        )
                     }
                 }
-
-                mostrarMensaje -> {
-                    Text(
-                        text = "No hay entrenamientos disponibles",
-                        color = Color.Black,
-                        fontSize = 18.sp
-                    )
-                }
-
-                else -> {
-                    CircularProgressIndicator(color = Color.Gray)
-                }
+            } else {
+                Text(
+                    text = "No hay entrenamientos disponibles",
+                    color = Color.Black,
+                    fontSize = 18.sp
+                )
             }
         }
     }
@@ -169,7 +149,7 @@ fun RutinaCardEntrenamiento(bloqueId: String, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Bloque: $bloqueId",  // Mostramos el ID del bloque
+                    text = "Bloque: $bloqueId",
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 )
             }
