@@ -47,6 +47,7 @@ fun PantallaEditarRutina(
     navController: NavController,
     viewModel: CaracteristicasEntrenamientoViewModel,
     bloqueId: String,
+    rutinaKey: String,
     nombreEntrenamiento: String,
     categoria: String,
     subcategorias: List<String>,
@@ -59,8 +60,8 @@ fun PantallaEditarRutina(
 
     var nombre by remember { mutableStateOf(nombreEntrenamiento) }
     var categoriaState by remember { mutableStateOf(categoria) }
-    var subcategoria by remember { mutableStateOf(subcategorias.joinToString(", ")) } // Convertimos la lista en un string
-    var diasState by remember { mutableStateOf(dias.joinToString(", ")) } // Convertimos la lista en un string
+    var subcategoria by remember { mutableStateOf(subcategorias.joinToString(", ")) }
+    var diasState by remember { mutableStateOf(dias.joinToString(", ")) }
     var descansoState by remember { mutableStateOf(descanso) }
     var repeticionesState by remember { mutableStateOf(repeticiones) }
     var seriesState by remember { mutableStateOf(series) }
@@ -162,12 +163,25 @@ fun PantallaEditarRutina(
                     repeticiones = repeticionesState,
                     series = seriesState,
                     bloqueId = bloqueId,
-                    rutinaKey = ""
+                    rutinaKey = rutinaKey
+                )
+                Log.d(
+                    "ActualizarEjercicioDebug", """
+    bloqueId: $bloqueId
+    rutinaKey: $rutinaKey
+    nombre: $nombre
+    categoria: $categoriaState
+    subcategoria: $subcategoria
+    dias: $diasList
+    descanso: $descansoState
+    repeticiones: $repeticionesState
+    series: $seriesState
+""".trimIndent()
                 )
 
                 viewModel.actualizarEjercicio(
                     bloqueId = bloqueId,
-                    rutinaKey = "",
+                    rutinaKey = rutinaKey,
                     ejercicioActual = ejercicioActual,
                     nuevoNombre = nombre,
                     nuevaCategoria = categoriaState,

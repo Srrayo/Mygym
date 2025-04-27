@@ -155,9 +155,10 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(
-                            route = "editar_rutina/{bloqueId}/{nombreEntrenamiento}/{categoria}/{subcategorias}/{dias}/{descanso}/{series}/{repeticiones}",
+                            route = "editar_rutina/{bloqueId}/{rutinaKey}/{nombreEntrenamiento}/{categoria}/{subcategorias}/{dias}/{descanso}/{series}/{repeticiones}",
                             arguments = listOf(
                                 navArgument("bloqueId") { type = NavType.StringType },
+                                navArgument("rutinaKey") { type = NavType.StringType },
                                 navArgument("nombreEntrenamiento") { type = NavType.StringType },
                                 navArgument("categoria") { type = NavType.StringType },
                                 navArgument("subcategorias") { type = NavType.StringType },
@@ -169,6 +170,7 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
 
                             val bloqueId = backStackEntry.arguments?.getString("bloqueId") ?: ""
+                            val rutinaKey = backStackEntry.arguments?.getString("rutinaKey") ?: ""
                             val nombreEntrenamiento = backStackEntry.arguments?.getString("nombreEntrenamiento") ?: ""
                             val categoria = backStackEntry.arguments?.getString("categoria") ?: ""
                             val subcategorias = backStackEntry.arguments?.getString("subcategorias")?.split(",") ?: emptyList()
@@ -182,6 +184,7 @@ class MainActivity : ComponentActivity() {
                             PantallaEditarRutina(
                                 navController = navController,
                                 bloqueId = bloqueId,
+                                rutinaKey = rutinaKey,
                                 nombreEntrenamiento = nombreEntrenamiento,
                                 categoria = categoria,
                                 subcategorias = subcategorias,
@@ -192,6 +195,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel = CaracteristicasEntrenamientoViewModel()
                             )
                         }
+
 
                     })
             }

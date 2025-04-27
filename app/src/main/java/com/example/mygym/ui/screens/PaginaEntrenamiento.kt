@@ -270,7 +270,7 @@ fun RutinaCardBloque(
                             val subcategoriaString = rutina.subcategorias?.joinToString(",") ?: ""
                             val diasString = rutina.dias?.joinToString(",") ?: ""
 
-                            val ruta = "editar_rutina/${rutina.bloqueId}/${Uri.encode(rutina.nombreEntrenamiento ?: "")}/${Uri.encode(rutina.categoria ?: "")}/${Uri.encode(subcategoriaString)}/${Uri.encode(diasString)}/${rutina.descanso}/${rutina.series}/${rutina.repeticiones}"
+                            val ruta = "editar_rutina/${rutina.bloqueId}/${rutina.rutinaKey}/${Uri.encode(rutina.nombreEntrenamiento ?: "")}/${Uri.encode(rutina.categoria ?: "")}/${Uri.encode(subcategoriaString)}/${Uri.encode(diasString)}/${rutina.descanso}/${rutina.series}/${rutina.repeticiones}"
 
                             navController.navigate(ruta)
                             Log.d("RutaGenerada", ruta)
