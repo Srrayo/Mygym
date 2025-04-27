@@ -107,7 +107,7 @@ fun HeaderPaginaPrincipal(
     Column(
         Modifier
             .background(Color(44, 44, 44))
-            .padding(16.dp), Arrangement.Center, Alignment.CenterHorizontally
+            .padding(10.dp), Arrangement.Center, Alignment.CenterHorizontally
     ) {
         Row(
             modifier = Modifier
@@ -123,7 +123,7 @@ fun HeaderPaginaPrincipal(
                     .size(100.dp)
             )
         }
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,7 +138,7 @@ fun HeaderPaginaPrincipal(
             )
             Text(text = "25", color = Color.White, fontSize = 30.sp)
         }
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 //        TabRowPantallas(navController,viewModel,viewModelCaracteristicas,dataUserViewModel,calendarViewModel)
     }
 }

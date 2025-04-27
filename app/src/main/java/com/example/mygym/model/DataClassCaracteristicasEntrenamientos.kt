@@ -1,7 +1,7 @@
 package com.example.mygym.model
 
 data class DataClassCaracteristicasEntrenamientos(
-    val nombre: String?,
+    val nombre: String? = null,
     val subcategorias: List<String>?,
     val nombreEntrenamiento: String?,
     val dias: List<String>? = null,
@@ -10,5 +10,5 @@ data class DataClassCaracteristicasEntrenamientos(
     val repeticiones: Int = 0,
     val series: Int = 0,
     val bloqueId: String? = null,
-    val rutinas: List<DataClassCaracteristicasEntrenamientos>? = null
+    val rutinaKey: String? = null,
 )

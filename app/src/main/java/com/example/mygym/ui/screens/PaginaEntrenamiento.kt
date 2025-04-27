@@ -1,6 +1,7 @@
 package com.example.mygym.ui.screens
 
 import CaracteristicasEntrenamientoViewModel
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -38,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,12 +54,10 @@ fun PaginaEntrenamiento(
     navController: NavController,
     viewModel: CaracteristicasEntrenamientoViewModel
 ) {
-    val rutinasGuardadas by viewModel.rutinasGuardadas.collectAsState()
 
-    // Agrupar las rutinas por bloque
+    val rutinasGuardadas by viewModel.rutinasGuardadas.collectAsState()
     val bloques = rutinasGuardadas.groupBy { it.bloqueId }
 
-    // Mostramos los bloques y las rutinas dentro de cada bloque
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,9 +86,9 @@ fun PaginaEntrenamiento(
                             bloqueId = bloqueId ?: "Bloque desconocido",
                             rutinas = rutinas,
                             onClickEditar = {
-                                // Acción para editar el bloque o la rutina
                                 navController.navigate("editar_bloque/$bloqueId")
-                            }
+                            },
+                            navController
                         )
                     }
                 }
@@ -158,14 +158,54 @@ fun RutinaCardEntrenamiento(bloqueId: String, onClick: () -> Unit) {
 }
 
 
+//@Composable
+//fun RutinaCard(rutina: DataClassCaracteristicasEntrenamientos, onClick: () -> Unit) {
+//    Log.d("Debug", "Rutina: $rutina, Categoria: ${rutina.categoria}, Nombre: ${rutina.nombreEntrenamiento}")
+//
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clickable { onClick() }
+//            .padding(vertical = 4.dp),
+//        elevation = CardDefaults.cardElevation(3.dp),
+//        shape = RoundedCornerShape(12.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.Gray)
+//    ) {
+//        Column(modifier = Modifier.padding(16.dp)) {
+//            Row(
+//                modifier = Modifier.padding(10.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text(
+//                    text = rutina.nombreEntrenamiento ?: "Nombre desconocido",
+//                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+//                )
+//                Text(
+//                    text = "Categoría: ${rutina.categoria ?: "Desconocida"}",
+//                    style = TextStyle(fontSize = 14.sp)
+//                )
+//            }
+//            Text(
+//                text = "Rutina: ${rutina.rutinaKey ?: "Desconocida"}",
+//                style = TextStyle(fontSize = 12.sp, fontStyle = FontStyle.Italic, color = Color.White),
+//                modifier = Modifier.padding(top = 8.dp)
+//            )
+//        }
+//    }
+//}
+
+
 @Composable
-fun RutinaCard(rutina: DataClassCaracteristicasEntrenamientos, onClick: () -> Unit) {
+fun RutinaCard(
+    rutina: DataClassCaracteristicasEntrenamientos,
+    onClick: (String) -> Unit
+) {
     Log.d("Debug", "Rutina: $rutina, Categoria: ${rutina.categoria}, Nombre: ${rutina.nombreEntrenamiento}")
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable { onClick(rutina.rutinaKey ?: "") }
             .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(3.dp),
         shape = RoundedCornerShape(12.dp),
@@ -185,19 +225,27 @@ fun RutinaCard(rutina: DataClassCaracteristicasEntrenamientos, onClick: () -> Un
                     style = TextStyle(fontSize = 14.sp)
                 )
             }
+            Text(
+                text = "Rutina: ${rutina.rutinaKey ?: "Desconocida"}",
+                style = TextStyle(fontSize = 12.sp, fontStyle = FontStyle.Italic, color = Color.White),
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
+
+
+
 
 
 @Composable
 fun RutinaCardBloque(
     bloqueId: String,
     rutinas: List<DataClassCaracteristicasEntrenamientos>,
-    onClickEditar: () -> Unit
+    onClickEditar: () -> Unit,
+    navController: NavController
 ) {
     var expandido by remember { mutableStateOf(false) }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -216,7 +264,20 @@ fun RutinaCardBloque(
             if (expandido) {
                 Spacer(modifier = Modifier.height(8.dp))
                 rutinas.forEach { rutina ->
-                    RutinaCard(rutina = rutina, onClick = { onClickEditar() })
+                    RutinaCard(
+                        rutina = rutina,
+                        onClick = {
+                            val subcategoriaString = rutina.subcategorias?.joinToString(",") ?: ""
+                            val diasString = rutina.dias?.joinToString(",") ?: ""
+
+                            val ruta = "editar_rutina/${rutina.bloqueId}/${Uri.encode(rutina.nombreEntrenamiento ?: "")}/${Uri.encode(rutina.categoria ?: "")}/${Uri.encode(subcategoriaString)}/${Uri.encode(diasString)}/${rutina.descanso}/${rutina.series}/${rutina.repeticiones}"
+
+                            navController.navigate(ruta)
+                            Log.d("RutaGenerada", ruta)
+                        }
+                    )
+
+
                     Spacer(modifier = Modifier.height(4.dp))
                 }
             }

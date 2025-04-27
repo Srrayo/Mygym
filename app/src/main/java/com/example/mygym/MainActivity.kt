@@ -3,11 +3,13 @@ package com.example.mygym
 import CaracteristicasEntrenamientoViewModel
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,6 +20,7 @@ import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.example.mygym.model.MainViewModel
 import com.example.mygym.ui.EditarEntrenamiento.EditarEntrenamientoViewModel
 import com.example.mygym.ui.EditarEntrenamiento.PantallaEdicionEjercicio
+//import com.example.mygym.ui.EditarEntrenamiento.PantallaEdicionEjercicio
 //import com.example.mygym.ui.EditarEntrenamiento.PantallaEdicionEntrenamiento
 import com.example.mygym.ui.screens.EdicionEntrenamiento
 import com.example.mygym.ui.screens.PaginaCalendario
@@ -26,6 +29,7 @@ import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
 import com.example.mygym.ui.PerfilUsuario.PaginaDataUser
 import com.example.mygym.ui.screens.PaginaEntrenamiento
 import com.example.mygym.ui.screens.PaginaPrincipal
+import com.example.mygym.ui.screens.PantallaEditarRutina
 import com.example.mygym.ui.screens.TabRowPantallas
 import com.example.mygym.ui.theme.MygymTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -131,7 +135,6 @@ class MainActivity : ComponentActivity() {
                             val series = backStackEntry.arguments?.getInt("series") ?: 0
 
                             val ejercicio = DataClassCaracteristicasEntrenamientos(
-                                nombre = null,
                                 subcategorias = listOf(subcategoria),
                                 nombreEntrenamiento = nombre,
                                 dias = dias,
@@ -139,7 +142,8 @@ class MainActivity : ComponentActivity() {
                                 descanso = descanso,
                                 repeticiones = repeticiones,
                                 series = series,
-                                bloqueId = bloqueId
+                                bloqueId = bloqueId,
+                                nombre = null
                             )
 
                             PantallaEdicionEjercicio(
@@ -149,6 +153,46 @@ class MainActivity : ComponentActivity() {
                                 rutinaKey = rutinaKey
                             )
                         }
+
+                        composable(
+                            route = "editar_rutina/{bloqueId}/{nombreEntrenamiento}/{categoria}/{subcategorias}/{dias}/{descanso}/{series}/{repeticiones}",
+                            arguments = listOf(
+                                navArgument("bloqueId") { type = NavType.StringType },
+                                navArgument("nombreEntrenamiento") { type = NavType.StringType },
+                                navArgument("categoria") { type = NavType.StringType },
+                                navArgument("subcategorias") { type = NavType.StringType },
+                                navArgument("dias") { type = NavType.StringType },
+                                navArgument("descanso") { type = NavType.IntType },
+                                navArgument("series") { type = NavType.IntType },
+                                navArgument("repeticiones") { type = NavType.IntType },
+                            )
+                        ) { backStackEntry ->
+
+                            val bloqueId = backStackEntry.arguments?.getString("bloqueId") ?: ""
+                            val nombreEntrenamiento = backStackEntry.arguments?.getString("nombreEntrenamiento") ?: ""
+                            val categoria = backStackEntry.arguments?.getString("categoria") ?: ""
+                            val subcategorias = backStackEntry.arguments?.getString("subcategorias")?.split(",") ?: emptyList()
+                            val dias = backStackEntry.arguments?.getString("dias")?.split(",") ?: emptyList()
+                            val descanso = backStackEntry.arguments?.getInt("descanso") ?: 0
+                            val series = backStackEntry.arguments?.getInt("series") ?: 0
+                            val repeticiones = backStackEntry.arguments?.getInt("repeticiones") ?: 0
+
+                            Log.d("EditarRutina", "nombreEntrenamiento: $nombreEntrenamiento, categoria: $categoria")
+
+                            PantallaEditarRutina(
+                                navController = navController,
+                                bloqueId = bloqueId,
+                                nombreEntrenamiento = nombreEntrenamiento,
+                                categoria = categoria,
+                                subcategorias = subcategorias,
+                                dias = dias,
+                                descanso = descanso,
+                                series = series,
+                                repeticiones = repeticiones,
+                                viewModel = CaracteristicasEntrenamientoViewModel()
+                            )
+                        }
+
                     })
             }
         }

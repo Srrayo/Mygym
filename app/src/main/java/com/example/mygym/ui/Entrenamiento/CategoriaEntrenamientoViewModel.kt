@@ -114,13 +114,11 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val userDocRef = db.collection("usuarios").document(userId)
-
-                // Creando el objeto de rutina
                 val rutina = mapOf(
                     "nombreEntrenamiento" to nombreEntrenamiento,
                     "categoria" to categoria,
                     "subcategoria" to subcategoria,
-                    "dias" to diasSeleccionados.toList(),  // Convirtiendo el set a lista
+                    "dias" to diasSeleccionados.toList(),
                     "descanso" to descanso,
                     "repeticones" to repeticiones,
                     "series" to series
@@ -159,7 +157,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                         "rutinasGuardadas" to rutinasGuardadas,
                         "fechaCreacion" to FieldValue.serverTimestamp()
                     ),
-                    SetOptions.merge()  // Mantenemos los datos existentes y solo actualizamos lo necesario
+                    SetOptions.merge()
                 ).await()
 
                 Log.d("FirestoreDebug", "Rutina guardada correctamente con nueva estructura.")
@@ -173,19 +171,21 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
     private fun getRutinasGuardadas(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Obtener documento de usuario desde Firestore
                 val userDoc = db.collection("usuarios").document(userId).get().await()
+
+                // Obtener rutinas guardadas en el documento del usuario
                 val rutinasMap = userDoc.get("rutinasGuardadas") as? Map<String, Map<String, List<Map<String, Any>>>> ?: emptyMap()
 
+                // Convertir las rutinas a una lista plana
                 val rutinas = rutinasMap.flatMap { (bloqueId, rutinaSet) ->
-                    // Iterar sobre las rutinas dentro de cada bloque
-                    rutinaSet.values.flatMap { rutinaList ->
+                    rutinaSet.flatMap { (rutinaKey, rutinaList) ->
                         rutinaList.mapNotNull { rutina ->
                             val nombre = rutina["nombreEntrenamiento"] as? String
                             val categoria = rutina["categoria"] as? String
                             val subcategoria = rutina["subcategoria"] as? String
                             val dias = rutina["dias"] as? List<String>
 
-                            // Crear un objeto DataClassCaracteristicasEntrenamientos para cada rutina
                             if (nombre != null && subcategoria != null) {
                                 DataClassCaracteristicasEntrenamientos(
                                     nombre = nombre,
@@ -193,7 +193,8 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
                                     subcategorias = listOf(subcategoria),
                                     nombreEntrenamiento = nombre,
                                     dias = dias,
-                                    bloqueId = bloqueId
+                                    bloqueId = bloqueId,
+                                    rutinaKey = rutinaKey
                                 )
                             } else null
                         }
@@ -208,6 +209,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
             }
         }
     }
+
 
 
 
@@ -236,7 +238,7 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
 
                 if (ejercicioLista.isNotEmpty()) {
                     val ejercicio = ejercicioLista[0]
-                    if (ejercicio["nombreEntrenamiento"] == ejercicioActual.nombreEntrenamiento) {
+                    if (ejercicio["nombreEntrenamiento"] == nuevoNombre) {
                         val nuevoEjercicio = ejercicio.toMutableMap().apply {
                             this["nombreEntrenamiento"] = nuevoNombre
                             this["categoria"] = nuevaCategoria
@@ -295,5 +297,9 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
         }
     }
 
-}
+    fun obtenerRutinaPorKey(rutinaKey: String): DataClassCaracteristicasEntrenamientos? {
+        Log.d("ObtenerRutinaPorKey", rutinaKey)
+        return _rutinasGuardadas.value.find { it.rutinaKey == rutinaKey }
+    }
 
+}
