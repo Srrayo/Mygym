@@ -5,8 +5,17 @@ package com.example.mygym.ui.Entrenamiento
 import CaracteristicasEntrenamientoViewModel
 import android.widget.NumberPicker
 import android.widget.Toast
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +28,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,11 +43,14 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.mygym.model.DataClassCaracteristicasEntrenamientos
 import com.example.mygym.ui.screens.CerrarVentana
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 //-- ↑ Imports ↑ -------------------------------------------------
 
@@ -230,7 +244,7 @@ fun PaginaCategoriaEntrenamientos(
                     label = { Text(text = "Nombre del entrenamiento") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 50.dp), // Aseguramos que el TextField esté centrado
+                        .padding(horizontal = 50.dp),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
@@ -257,7 +271,7 @@ fun PaginaCategoriaEntrenamientos(
 
                 Button(
                     onClick = {
-                        mostrarLista = !mostrarLista // Cambia el estado al hacer clic
+                        mostrarLista = !mostrarLista
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(95, 95, 95),
@@ -272,7 +286,6 @@ fun PaginaCategoriaEntrenamientos(
                 }
             }
 
-            // Mostramos la lista solo si mostrarLista es true
             if (mostrarLista) {
                 items(caracteristicasEntrenamientos) { entrenamiento ->
                     EntrenamientosCardExpandible(
@@ -410,7 +423,7 @@ fun SelectorDiasSemana(
                 .padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { // controla espacio entre letras
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 diasSemana.forEach { dia ->
                     val estaSeleccionado = diasSeleccionados.contains(dia)
 
@@ -548,9 +561,9 @@ fun ControlConBoton(
 fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val desplazamiento = 0.dp // Queremos desplazarlo 200.dp
-    var offsetY by remember { mutableStateOf((-210).dp) } // Empieza a los 100.dp (parte visible)
-    var expanded by remember { mutableStateOf(false) } // Estado de expansión
+    val desplazamiento = 0.dp
+    var offsetY by remember { mutableStateOf((-210).dp) }
+    var expanded by remember { mutableStateOf(false) }
     val offsetAnimado by animateDpAsState(targetValue = offsetY, label = "")
 
     Column(
@@ -561,9 +574,7 @@ fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
             .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
             .background(Color(44, 44, 44))
             .clickable {
-                // Al hacer clic, alternamos el estado de expansión
                 expanded = !expanded
-                // Ajustamos el desplazamiento de 100.dp a 200.dp
                 offsetY = if (expanded) desplazamiento else (-210).dp
             },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -596,22 +607,20 @@ fun RutinaCardArchivada(rutina: Map<String, Any>) {
             .padding(5.dp)
             .border(1.dp, Color(145, 145, 145), RoundedCornerShape(15.dp))
             .clickable {
-                expanded = !expanded // Cambia el estado de expandido al hacer clic
+                expanded = !expanded
             }
-            .animateContentSize(),  // Añade la animación de expansión
+            .animateContentSize(),
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(containerColor = Color(240, 240, 240))
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
-            // Muestra el nombre de la rutina
             Column(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
                 Text(
-                    "◆ ${rutina["nombreEntrenamiento"]} ◆",
+                    "${rutina["categoria"]}",
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
                 )
             }
-            // Si está expandido, muestra los detalles adicionales
             if (expanded) {
                 Text("Categoría: ${rutina["categoria"]}", color = Color.Black)
                 Text("Subcategoría: ${rutina["subcategoria"]}", color = Color.Black)
@@ -626,3 +635,157 @@ fun RutinaCardArchivada(rutina: Map<String, Any>) {
         }
     }
 }
+
+
+//enum class ButtonState {
+//    IDLE, LOADING, SUCCESS, ERROR
+//}
+//
+//@Composable
+//fun AnimatedSaveButton(
+//    listaEjercicios: List<Map<String, Any>>,
+//    userId: String,
+//    nombreEntrenamiento: String,
+//    diasSeleccionados: Set<String>,
+//    descanso: Int,
+//    repeticiones: Int,
+//    series: Int,
+//    bloqueTimestamp: Long,
+//    viewModelCategoria: CaracteristicasEntrenamientoViewModel,
+//    navController: NavController
+//) {
+//    var buttonState by remember { mutableStateOf(ButtonState.IDLE) }
+//    val transition = updateTransition(targetState = buttonState, label = "buttonTransition")
+//    val context = LocalContext.current
+//    val scope = rememberCoroutineScope()
+//
+//    // Animación de tamaño
+//    val buttonSize by transition.animateDp(
+//        transitionSpec = { tween(durationMillis = 200) },
+//        label = "buttonSize"
+//    ) { state ->
+//        when (state) {
+//            ButtonState.LOADING -> 48.dp
+//            else -> 40.dp
+//        }
+//    }
+//
+//    // Animación de color de fondo
+//    val buttonColor by transition.animateColor(
+//        transitionSpec = { tween(durationMillis = 300) },
+//        label = "buttonColor"
+//    ) { state ->
+//        when (state) {
+//            ButtonState.IDLE -> Color.White
+//            ButtonState.LOADING -> Color(0xFF2196F3) // Azul
+//            ButtonState.SUCCESS -> Color(0xFF4CAF50) // Verde
+//            ButtonState.ERROR -> Color(0xFFF44336) // Rojo
+//        }
+//    }
+//
+//    // Animación de rotación para el ícono de carga
+//    val infiniteTransition = rememberInfiniteTransition()
+//    val rotation by infiniteTransition.animateFloat(
+//        initialValue = 0f,
+//        targetValue = 360f,
+//        animationSpec = infiniteRepeatable(
+//            animation = tween(1000, easing = LinearEasing),
+//            repeatMode = RepeatMode.Restart
+//        ),
+//        label = "loadingRotation"
+//    )
+//
+//    Button(
+//        onClick = {
+//            if (listaEjercicios.isNotEmpty()) {
+//                buttonState = ButtonState.LOADING
+//
+//                scope.launch {
+//                    try {
+//                        listaEjercicios.forEachIndexed { index, rutina ->
+//                            val categoria = rutina["categoria"] as String
+//                            val subcategoria = rutina["subcategoria"] as String
+//
+//                            viewModelCategoria.guardarRutinaEnFirestore(
+//                                userId,
+//                                categoria,
+//                                subcategoria,
+//                                nombreEntrenamiento,
+//                                diasSeleccionados.toList(),
+//                                descanso,
+//                                repeticiones,
+//                                series,
+//                                bloqueTimestamp,
+//                                index
+//                            )
+//                        }
+//
+//                        buttonState = ButtonState.SUCCESS
+//                        delay(500) // Muestra el estado de éxito brevemente
+//
+//                        Toast.makeText(
+//                            context,
+//                            "Rutinas guardadas en Firebase",
+//                            Toast.LENGTH_LONG
+//                        ).show()
+//                        navController.navigate("tabRowPantallas")
+//                    } catch (e: Exception) {
+//                        buttonState = ButtonState.ERROR
+//                        Toast.makeText(
+//                            context,
+//                            "Error al guardar: ${e.message}",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        delay(1000)
+//                        buttonState = ButtonState.IDLE
+//                    }
+//                }
+//            } else {
+//                buttonState = ButtonState.ERROR
+//                Toast.makeText(
+//                    context,
+//                    "No hay rutinas para guardar",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                scope.launch {
+//                    delay(1000)
+//                    buttonState = ButtonState.IDLE
+//                }
+//            }
+//        },
+//        colors = ButtonDefaults.buttonColors(
+//            containerColor = buttonColor,
+//            contentColor = when (buttonState) {
+//                ButtonState.IDLE -> Color.Black
+//                else -> Color.White
+//            }
+//        ),
+//        modifier = Modifier
+//            .padding(bottom = 15.dp, top = 15.dp, end = 15.dp)
+//            .height(buttonSize)
+//            .width(if (buttonState == ButtonState.LOADING) buttonSize else 120.dp),
+//        shape = RoundedCornerShape(5.dp),
+//        enabled = buttonState != ButtonState.LOADING
+//    ) {
+//        when (buttonState) {
+//            ButtonState.IDLE -> Text("Guardar", fontSize = 16.sp)
+//            ButtonState.LOADING -> {
+//                CircularProgressIndicator(
+//                    modifier = Modifier.size(20.dp),
+//                    color = Color.White,
+//                    strokeWidth = 3.dp
+//                )
+//            }
+//            ButtonState.SUCCESS -> Icon(
+//                imageVector = Icons.Default.Check,
+//                contentDescription = "Éxito",
+//                tint = Color.White
+//            )
+//            ButtonState.ERROR -> Icon(
+//                imageVector = Icons.Default.Error,
+//                contentDescription = "Error",
+//                tint = Color.White
+//            )
+//        }
+//    }
+//}

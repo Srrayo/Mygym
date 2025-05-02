@@ -53,7 +53,7 @@ fun CrearEntrenamiento(
     var nombreInput by remember { mutableStateOf(viewModel.nombre) }
     var diaInput by remember { mutableStateOf(viewModel.dia) }
     var entrenamientoInput by remember { mutableStateOf(viewModel.entrenamiento) }
-    val mensajeError by remember { mutableStateOf("") } // Estado para el mensaje de error
+    val mensajeError by remember { mutableStateOf("") }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -74,7 +74,7 @@ fun CrearEntrenamiento(
             onEntrenamientoChange = { entrenamientoInput = it },
             viewModel = viewModel,
             mensajeError = mensajeError,
-            caracteristicas =  caracteristicas// Pasa el mensaje de error
+            caracteristicas =  caracteristicas
         )
 
 
@@ -108,7 +108,7 @@ fun RellenarCampos(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
-        val focusManager = LocalFocusManager.current // Manejador del foco
+        val focusManager = LocalFocusManager.current
 
         TextField(
             value = nombreInput,
@@ -124,11 +124,11 @@ fun RellenarCampos(
                 unfocusedIndicatorColor = Color.Gray,
                 cursorColor = Color.Black
             ),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), // Define la acción del teclado
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    keyboardController?.hide() // Cierra el teclado
-                    focusManager.clearFocus() // Quita el foco del TextField (el cursor desaparece)
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
                 }
             )
         )
@@ -203,7 +203,7 @@ fun RellenarCampos(
             }
         }
 
-        // Mostrar el mensaje de error al final del Column
+
         if (mensajeError.isNotEmpty()) {
             Text(
                 text = mensajeError,
@@ -221,8 +221,8 @@ fun BotonGuardar(
     navController: NavController,
     viewModel: MainViewModel,
     nombreInput: String,
-    mensajeError: String, // Recibe el mensaje de error
-    onMensajeErrorChange: (String) -> Unit // Recibe una función para actualizar el mensaje de error
+    mensajeError: String,
+    onMensajeErrorChange: (String) -> Unit
 ) {
     BottomAppBar {
         Column(
@@ -244,7 +244,6 @@ fun BotonGuardar(
                         //viewModel.entrenamientos = viewModel.entrenamientos + nuevoEntrenamiento
                         //navController.navigate("paginaPrincipal")
                     } else {
-                        // Actualiza el mensaje de error
                         onMensajeErrorChange("Por favor, rellene todos los campos antes de guardar.")
                     }
                 },

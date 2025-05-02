@@ -29,20 +29,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserViewModel) {
-    // Acceder al auth para obtener el usuario logueado
     val user = FirebaseAuth.getInstance().currentUser
     val userId = user?.uid ?: return
 
-    // Cargar los datos del usuario cuando la pantalla se muestra
     LaunchedEffect(userId) {
         dataUserViewModel.loadUserData(userId)
     }
 
-    // Obtener los datos de usuario del ViewModel
     val usuario = dataUserViewModel.usuario
 
-    // Estado para los campos editables
-    // Inicializa los campos con los valores de Firebase si los datos están disponibles
     var nombre by remember { mutableStateOf(usuario.nombre) }
     var apellidos by remember { mutableStateOf(usuario.apellidos) }
     var edad by remember { mutableStateOf(usuario.edad) }
@@ -50,7 +45,6 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
     var altura by remember { mutableStateOf(usuario.altura) }
     var fechaNacimiento by remember { mutableStateOf(usuario.fechaNacimiento) }
 
-    // Estado para saber qué campo se está editando
     var campoEditando by remember { mutableStateOf<String?>(null) }
 
     fun saveNombre() {
@@ -168,7 +162,7 @@ fun PaginaDataUser(navController: NavController, dataUserViewModel: DataUserView
                                 onEditarCambiar(false)
                             },
                             modifier = Modifier
-                                .width(100.dp) // Cambia 15.dp a un valor más razonable
+                                .width(100.dp)
                                 .height(36.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(

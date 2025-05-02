@@ -66,9 +66,6 @@ fun PaginaEntrenamiento(
         verticalArrangement = Arrangement.Top
     ) {
         CrearNuevoEntreanmiento(navController)
-        Spacer(modifier = Modifier.height(5.dp))
-        Text("Editar entrenamientos")
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -115,9 +112,9 @@ fun CrearNuevoEntreanmiento(navController: NavController) {
         ),
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
-            .height(80.dp)
+            .height(70.dp)
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(start = 45.dp, end = 45.dp, top = 10.dp, bottom = 10.dp)
             .clip(RoundedCornerShape(10.dp))
             .shadow(10.dp, RoundedCornerShape(10.dp))
     ) {
@@ -156,44 +153,6 @@ fun RutinaCardEntrenamiento(bloqueId: String, onClick: () -> Unit) {
         }
     }
 }
-
-
-//@Composable
-//fun RutinaCard(rutina: DataClassCaracteristicasEntrenamientos, onClick: () -> Unit) {
-//    Log.d("Debug", "Rutina: $rutina, Categoria: ${rutina.categoria}, Nombre: ${rutina.nombreEntrenamiento}")
-//
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clickable { onClick() }
-//            .padding(vertical = 4.dp),
-//        elevation = CardDefaults.cardElevation(3.dp),
-//        shape = RoundedCornerShape(12.dp),
-//        colors = CardDefaults.cardColors(containerColor = Color.Gray)
-//    ) {
-//        Column(modifier = Modifier.padding(16.dp)) {
-//            Row(
-//                modifier = Modifier.padding(10.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(
-//                    text = rutina.nombreEntrenamiento ?: "Nombre desconocido",
-//                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
-//                )
-//                Text(
-//                    text = "Categoría: ${rutina.categoria ?: "Desconocida"}",
-//                    style = TextStyle(fontSize = 14.sp)
-//                )
-//            }
-//            Text(
-//                text = "Rutina: ${rutina.rutinaKey ?: "Desconocida"}",
-//                style = TextStyle(fontSize = 12.sp, fontStyle = FontStyle.Italic, color = Color.White),
-//                modifier = Modifier.padding(top = 8.dp)
-//            )
-//        }
-//    }
-//}
-
 
 @Composable
 fun RutinaCard(
@@ -246,20 +205,44 @@ fun RutinaCardBloque(
     navController: NavController
 ) {
     var expandido by remember { mutableStateOf(false) }
+    val categoriasUnicas = remember(rutinas) {
+        rutinas.mapNotNull { it.categoria }.distinct()
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(start = 30.dp, end = 30.dp, bottom = 10.dp)
             .clickable { expandido = !expandido },
         elevation = CardDefaults.cardElevation(3.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Bloque: $bloqueId",
-                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            )
+//            Text(
+//                text = "Bloque: $bloqueId",
+//                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+//            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth().height(35.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ){
+                if (categoriasUnicas.isNotEmpty()) {
+                    Text(
+                        text = categoriasUnicas.joinToString(", "),
+                        style = TextStyle(fontSize = 13.sp, color = Color.Black)
+                    )
+                } else {
+                    Text(
+                        text = "Bloque sin categorías definidas",
+                        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    )
+                }
+            }
+
+
 
             if (expandido) {
                 Spacer(modifier = Modifier.height(8.dp))

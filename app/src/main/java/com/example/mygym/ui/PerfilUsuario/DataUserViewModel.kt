@@ -12,10 +12,8 @@ import kotlinx.coroutines.launch
 class DataUserViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
 
-    // LiveData o State que almacenará los datos del usuario
     var usuario by mutableStateOf(DataClassUsuario())
 
-    // Cargar los datos del usuario desde Firestore
     fun loadUserData(userId: String) {
         viewModelScope.launch {
             try {
@@ -35,7 +33,6 @@ class DataUserViewModel : ViewModel() {
         }
     }
 
-    // Función para guardar los datos actualizados en Firestore
     fun updateUserProfile(userId: String) {
         viewModelScope.launch {
             try {
@@ -50,7 +47,6 @@ class DataUserViewModel : ViewModel() {
                 )
                 userDoc.update(updatedData)
             } catch (e: Exception) {
-                // Manejo de errores
             }
         }
     }

@@ -280,48 +280,43 @@ class CaracteristicasEntrenamientoViewModel : ViewModel() {
             }
         }
     }
-
-
-
-
-    fun getRutinasPorBloque(userId: String, bloqueId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val userDocRef = db.collection("usuarios").document(userId)
-                val snapshot = userDocRef.get().await()
-
-                val rutinas = snapshot.get("rutinasGuardadas") as? Map<String, Map<String, List<Map<String, Any>>>> ?: emptyMap()
-
-                val rutinasPorBloque = rutinas[bloqueId]?.mapNotNull { (rutinaKey, rutinaList) ->
-                    val rutina = rutinaList.firstOrNull()
-                    rutina?.let {
-                        val nombre = it["nombreEntrenamiento"] as? String
-                        val categoria = it["categoria"] as? String
-                        val subcategoria = it["subcategoria"] as? String
-                        val dias = it["dias"] as? List<String>
-
-                        DataClassCaracteristicasEntrenamientos(
-                            nombre = nombre,
-                            categoria = categoria,
-                            subcategorias = listOf(subcategoria ?: ""),
-                            nombreEntrenamiento = nombre,
-                            dias = dias
-                        )
-                    }
-                } ?: emptyList()
-
-                _entrenamiento.value = rutinasPorBloque
-                Log.d("FirestoreDebug", "Rutinas para bloque $bloqueId: $rutinasPorBloque")
-
-            } catch (e: Exception) {
-                Log.e("FirestoreDebug", "Error al obtener rutinas por bloque: ${e.message}")
-            }
-        }
-    }
-
-    fun obtenerRutinaPorKey(rutinaKey: String): DataClassCaracteristicasEntrenamientos? {
-        Log.d("ObtenerRutinaPorKey", rutinaKey)
-        return _rutinasGuardadas.value.find { it.rutinaKey == rutinaKey }
-    }
-
+//    fun getRutinasPorBloque(userId: String, bloqueId: String) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//                val userDocRef = db.collection("usuarios").document(userId)
+//                val snapshot = userDocRef.get().await()
+//
+//                val rutinas = snapshot.get("rutinasGuardadas") as? Map<String, Map<String, List<Map<String, Any>>>> ?: emptyMap()
+//
+//                val rutinasPorBloque = rutinas[bloqueId]?.mapNotNull { (rutinaKey, rutinaList) ->
+//                    val rutina = rutinaList.firstOrNull()
+//                    rutina?.let {
+//                        val nombre = it["nombreEntrenamiento"] as? String
+//                        val categoria = it["categoria"] as? String
+//                        val subcategoria = it["subcategoria"] as? String
+//                        val dias = it["dias"] as? List<String>
+//
+//                        DataClassCaracteristicasEntrenamientos(
+//                            nombre = nombre,
+//                            categoria = categoria,
+//                            subcategorias = listOf(subcategoria ?: ""),
+//                            nombreEntrenamiento = nombre,
+//                            dias = dias
+//                        )
+//                    }
+//                } ?: emptyList()
+//
+//                _entrenamiento.value = rutinasPorBloque
+//                Log.d("FirestoreDebug", "Rutinas para bloque $bloqueId: $rutinasPorBloque")
+//
+//            } catch (e: Exception) {
+//                Log.e("FirestoreDebug", "Error al obtener rutinas por bloque: ${e.message}")
+//            }
+//        }
+//    }
+//
+//    fun obtenerRutinaPorKey(rutinaKey: String): DataClassCaracteristicasEntrenamientos? {
+//        Log.d("ObtenerRutinaPorKey", rutinaKey)
+//        return _rutinasGuardadas.value.find { it.rutinaKey == rutinaKey }
+//    }
 }

@@ -25,6 +25,7 @@ import com.example.mygym.ui.EditarEntrenamiento.PantallaEdicionEjercicio
 import com.example.mygym.ui.screens.EdicionEntrenamiento
 import com.example.mygym.ui.screens.PaginaCalendario
 import com.example.mygym.ui.Entrenamiento.PaginaCategoriaEntrenamientos
+import com.example.mygym.ui.IniciarEntrenamiento.PaginaIniciarEntrenamiento
 import com.example.mygym.ui.PerfilUsuario.DataUserViewModel
 import com.example.mygym.ui.PerfilUsuario.PaginaDataUser
 import com.example.mygym.ui.screens.PaginaEntrenamiento
@@ -110,6 +111,13 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        composable("paginaIniciarEntrenamiento"){
+                            PaginaIniciarEntrenamiento(
+                                navController = navController,
+                                viewModelCaracteristicas = CalendarViewModel()
+                            )
+                        }
+
                         composable(
                             "editar_ejercicio/{bloqueId}/{rutinaKey}/{nombreEntrenamiento}/{categoria}/{subcategoria}/{dias}/{descanso}/{repeticiones}/{series}",
                             arguments = listOf(
@@ -126,10 +134,13 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             val bloqueId = backStackEntry.arguments?.getString("bloqueId") ?: ""
                             val rutinaKey = backStackEntry.arguments?.getString("rutinaKey") ?: ""
-                            val nombre = backStackEntry.arguments?.getString("nombreEntrenamiento") ?: ""
+                            val nombre =
+                                backStackEntry.arguments?.getString("nombreEntrenamiento") ?: ""
                             val categoria = backStackEntry.arguments?.getString("categoria") ?: ""
-                            val subcategoria = backStackEntry.arguments?.getString("subcategoria") ?: ""
-                            val dias = backStackEntry.arguments?.getString("dias")?.split(",") ?: emptyList()
+                            val subcategoria =
+                                backStackEntry.arguments?.getString("subcategoria") ?: ""
+                            val dias = backStackEntry.arguments?.getString("dias")?.split(",")
+                                ?: emptyList()
                             val descanso = backStackEntry.arguments?.getInt("descanso") ?: 0
                             val repeticiones = backStackEntry.arguments?.getInt("repeticiones") ?: 0
                             val series = backStackEntry.arguments?.getInt("series") ?: 0
@@ -171,15 +182,22 @@ class MainActivity : ComponentActivity() {
 
                             val bloqueId = backStackEntry.arguments?.getString("bloqueId") ?: ""
                             val rutinaKey = backStackEntry.arguments?.getString("rutinaKey") ?: ""
-                            val nombreEntrenamiento = backStackEntry.arguments?.getString("nombreEntrenamiento") ?: ""
+                            val nombreEntrenamiento =
+                                backStackEntry.arguments?.getString("nombreEntrenamiento") ?: ""
                             val categoria = backStackEntry.arguments?.getString("categoria") ?: ""
-                            val subcategorias = backStackEntry.arguments?.getString("subcategorias")?.split(",") ?: emptyList()
-                            val dias = backStackEntry.arguments?.getString("dias")?.split(",") ?: emptyList()
+                            val subcategorias =
+                                backStackEntry.arguments?.getString("subcategorias")?.split(",")
+                                    ?: emptyList()
+                            val dias = backStackEntry.arguments?.getString("dias")?.split(",")
+                                ?: emptyList()
                             val descanso = backStackEntry.arguments?.getInt("descanso") ?: 0
                             val series = backStackEntry.arguments?.getInt("series") ?: 0
                             val repeticiones = backStackEntry.arguments?.getInt("repeticiones") ?: 0
 
-                            Log.d("EditarRutina", "nombreEntrenamiento: $nombreEntrenamiento, categoria: $categoria")
+                            Log.d(
+                                "EditarRutina",
+                                "nombreEntrenamiento: $nombreEntrenamiento, categoria: $categoria"
+                            )
 
                             PantallaEditarRutina(
                                 navController = navController,
@@ -195,8 +213,6 @@ class MainActivity : ComponentActivity() {
                                 viewModel = CaracteristicasEntrenamientoViewModel()
                             )
                         }
-
-
                     })
             }
         }
