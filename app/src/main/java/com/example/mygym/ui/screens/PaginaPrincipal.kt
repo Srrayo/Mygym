@@ -74,7 +74,7 @@ fun PaginaPrincipal(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .background(Color(236, 240, 241)),
+            .background(Color(25, 25, 25 )),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 //            HeaderPaginaPrincipal(navController, viewModel, viewModelCaracteristicas, dataUserViewModel, calendarViewModel)

@@ -194,45 +194,6 @@ fun PaginaCategoriaEntrenamientos(
             }
 
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = "Categoría: ",
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Text(
-                                text = categoriaSeleccionada ?: "No seleccionada",
-                                color = Color.Gray
-                            )
-                        }
-
-                        Column {
-                            Text(
-                                text = "Subcategoría: ",
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Text(
-                                text = subcategoriaSeleccionada ?: "No seleccionada",
-                                color = Color.Gray
-                            )
-                        }
-                    }
-                }
-            }
-
-
-            item {
                 TextField(
                     value = nombreEntrenamiento,
                     onValueChange = {
@@ -341,6 +302,58 @@ fun PaginaCategoriaEntrenamientos(
                 )
             }
 
+
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Categoría: ",
+//                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = categoriaSeleccionada ?: "No seleccionada",
+                                color = Color.Gray
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Subcategoría: ",
+//                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                            Text(
+                                text = subcategoriaSeleccionada ?: "No seleccionada",
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+            }
+
             item {
                 Spacer(modifier = Modifier.height(10.dp))
                 RutinasArchivadas(listaEjercicios)
@@ -383,7 +396,7 @@ fun EntrenamientosCardExpandible(
             if (expanded) {
                 caracteristicas.subcategorias?.forEach { subcategoria ->
                     Button(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 80.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 80.dp).height(65.dp).padding(top = 10.dp),
                         onClick = {
                             onSeleccionar(caracteristicas.nombre ?: "Desconocido", subcategoria)
                             expanded = false
@@ -393,7 +406,8 @@ fun EntrenamientosCardExpandible(
                     ) {
                         Text(
                             text = subcategoria,
-                            color = Color.Black
+                            color = Color.Black,
+                            fontSize = 10.sp
                         )
                     }
                 }
@@ -569,8 +583,8 @@ fun RutinasArchivadas(listaEjercicios: List<Map<String, Any>>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(250.dp) // Fijamos la altura total a 300.dp
-            .offset(y = -offsetAnimado) // Desplazamos 200.dp hacia arriba
+            .height(250.dp)
+            .offset(y = -offsetAnimado)
             .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
             .background(Color(44, 44, 44))
             .clickable {

@@ -334,7 +334,6 @@ fun PantallaEditarRutina(
             item {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Mostrar la categoría y subcategoría actual seleccionada
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween

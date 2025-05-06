@@ -298,7 +298,6 @@ fun registrarUsuario(
                 val db = FirebaseFirestore.getInstance()
                 val userDoc = db.collection("usuarios").document(userId)
 
-                // Datos iniciales para el usuario en Firestore
                 val datosIniciales = hashMapOf(
                     "nombre" to "",
                     "apellidos" to "",
@@ -307,8 +306,7 @@ fun registrarUsuario(
                     "altura" to "",
                     "fechaNacimiento" to "",
                     "categorias" to hashMapOf(
-                        "Gimnasio" to listOf(
-                            //pecho
+                        "Pecho" to listOf(
                             "Press de banca plano con barra",
                             "Press de banca inclinado con barra",
                             "Press de banca declinado con barra",
@@ -369,7 +367,9 @@ fun registrarUsuario(
                             "Press de pecho en máquina Smith",
                             "Press inclinado en máquina Smith",
                             "Press declinado en máquina Smith",
-                            //pierna
+                        ),
+                        //pierna
+                        "Pierna" to listOf(
                             "Sentadillas con barra",
                             "Sentadillas frontales",
                             "Sentadillas búlgaras",
@@ -435,7 +435,9 @@ fun registrarUsuario(
                             "Peso muerto deficitario",
                             "Peso muerto con pausa",
                             "Good mornings con mancuernas",
-                             //espalda
+                        ),
+                        //espalda
+                        "Espalda" to listOf(
                             "Dominadas pronas (agarre ancho)",
                             "Dominadas supinas (agarre estrecho)",
                             "Dominadas neutras",
@@ -496,7 +498,9 @@ fun registrarUsuario(
                             "Peso muerto con banda elástica",
                             "Remo con agarre en diamante",
                             "Pull-down unilateral con rotación",
-                             //brazo
+                        ),
+                        //brazo
+                        "Brazo" to listOf(
                             "Curl de bíceps con barra",
                             "Curl de bíceps con barra en agarre ancho",
                             "Curl de bíceps con barra en agarre estrecho",
@@ -545,7 +549,9 @@ fun registrarUsuario(
                             "Dominadas con agarre invertido (bíceps)",
                             "Curl Zottman (bíceps y antebrazo)",
                             "Remo al mentón con agarre cerrado (trapecio/deltoides)",
-                             //abdomen
+                        ),
+                        //abdomen
+                        "Abdomen" to listOf(
                             "Crunch abdominal",
                             "Crunch con piernas elevadas",
                             "Crunch inverso",
@@ -597,7 +603,9 @@ fun registrarUsuario(
                             "Abdominales con flexión lateral con mancuerna",
                             "Abdominales con patada de mula (donkey kicks)",
                             "Abdominales con resistencia de compañero",
-                            //hombro
+                        ),
+                        //hombro
+                        "Hombro" to listOf(
                             "Press militar con barra",
                             "Press militar con mancuernas",
                             "Press Arnold (press rotacional)",
@@ -650,6 +658,7 @@ fun registrarUsuario(
                             "Press de hombros en máquina Hammer",
                             "Press de hombros con agarre offset"
                         ),
+
                         "Cardio" to listOf("Cinta", "Elíptica", "Bicicleta", "Saltos"),
                         "Flexibilidad" to listOf(
                             "Yoga",
@@ -664,7 +673,6 @@ fun registrarUsuario(
                     "seleccionados" to listOf<String>()
                 )
 
-                // Guardar la estructura en Firestore
                 userDoc.set(datosIniciales)
                     .addOnSuccessListener {
                         onSuccess()

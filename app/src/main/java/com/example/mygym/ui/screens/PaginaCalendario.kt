@@ -14,8 +14,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mygym.model.CalendarViewModel
 import com.example.mygym.model.MainViewModel
@@ -118,217 +127,273 @@ fun CalendarApp(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(236, 240, 241))
-            .verticalScroll(scrollState)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(scrollState).background(Color(25, 25, 25))){
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(25, 25, 25))
+                .padding(30.dp),
+            contentAlignment = Alignment.Center
         ) {
-            IconButton(
-                onClick = {
-                    fechaActual = fechaActual.minusMonths(1)
-                    calendarViewModel.cargarEntrenamientos()
-                }
-            ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Mes Anterior", tint = Color.Black)
-            }
-
-            Text(
-                text = "$nombreMes $anyoActual",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = Color.Black,
-            )
-
-            IconButton(
-                onClick = {
-                    fechaActual = fechaActual.plusMonths(1)
-                    calendarViewModel.cargarEntrenamientos()
-                }
-            ) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Mes Siguiente", tint = Color.Black)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            listOf("L", "M", "X", "J", "V", "S", "D").forEach { day ->
-                Text(
-                    text = day,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black,
-                    modifier = Modifier.width(40.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            modifier = Modifier.heightIn(max = 500.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(dias) { date ->
-                val diaDelMes = date.dayOfMonth
-                val esMesActual = date.month == mesActual
-                val esHoy = date == LocalDate.now()
-                val estaSeleccionado = fechaSeleccionada == date
-                val tieneEntrenamiento = fechasConEntrenamiento.contains(date)
-                val tieneNota = notasEntrenamiento.containsKey(date)
-
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(
-                            when {
-                                esHoy && estaSeleccionado -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                                esHoy -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                                estaSeleccionado -> MaterialTheme.colorScheme.primary
-                                tieneEntrenamiento -> if (tieneNota) Color(0xFF4CAF50).copy(alpha = 0.7f)
-                                else Color(0xFFFFA000).copy(alpha = 0.7f)
-                                else -> Color.Transparent
-                            }
-                        )
-                        .border(
-                            width = if (tieneEntrenamiento) 2.dp else 1.dp,
-                            color = when {
-                                tieneNota -> Color(0xFF388E3C)
-                                tieneEntrenamiento -> Color.Yellow
-                                esMesActual -> MaterialTheme.colorScheme.outline
-                                else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                            },
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .clickable { fechaSeleccionada = date },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = diaDelMes.toString(),
-                            color = when {
-                                !esMesActual -> Color.Gray
-                                estaSeleccionado -> MaterialTheme.colorScheme.onPrimary
-                                else -> Color.Black
-                            },
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        if (tieneNota) {
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Box(
-                                modifier = Modifier
-                                    .size(6.dp)
-                                    .clip(RoundedCornerShape(50))
-                                    .background(Color(0xFF388E3C))
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        fechaSeleccionada?.let { date ->
-            val notaGuardada = notasEntrenamiento[date]
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color.Black)
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Notas para ${date.dayOfMonth} de ${
-                        date.month.getDisplayName(
-                            TextStyle.FULL,
-                            Locale.getDefault()
-                        )
-                    }",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Black
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                notaGuardada?.let { nota ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 10.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {
+                            fechaActual = fechaActual.minusMonths(1)
+                            calendarViewModel.cargarEntrenamientos()
+                        }
                     ) {
-                        Text(
-                            text = nota,
-                            modifier = Modifier.padding(12.dp),
-                            color = Color.Black
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Mes Anterior",
+                            tint = Color.White
+                        )
+                    }
+
+                    Text(
+                        text = "$nombreMes $anyoActual",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = Color.White,
+                    )
+
+                    IconButton(
+                        onClick = {
+                            fechaActual = fechaActual.plusMonths(1)
+
+                            calendarViewModel.cargarEntrenamientos()
+                        }
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Mes Siguiente",
+                            tint = Color.White
                         )
                     }
                 }
 
-                OutlinedTextField(
-                    value = notaTexto,
-                    onValueChange = { notaTexto = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    placeholder = {
-                        Text(
-                            if (notaGuardada == null) "Escribe tus notas aquí..."
-                            else "Editar nota existente..."
-                        )
-                    },
-                    shape = RoundedCornerShape(8.dp)
-                )
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Button(
-                        onClick = {
-                            fechaSeleccionada?.let {
-                                calendarViewModel.guardarEntrenamiento(it, notaTexto)
-                                notaTexto = ""
-                            }
-                        },
-                        modifier = Modifier.padding(top = 8.dp),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(if (notaGuardada == null) "Guardar Nota" else "Actualizar Nota")
+                    listOf("L", "M", "X", "J", "V", "S", "D").forEach { day ->
+                        Text(
+                            text = day,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
+                            modifier = Modifier.width(40.dp),
+                            textAlign = TextAlign.Center
+                        )
                     }
+                }
 
-                    if (notaGuardada != null) {
-                        Button(
-                            onClick = {
-                                fechaSeleccionada?.let {
-                                    calendarViewModel.eliminarNota(it)
-                                    notaTexto = ""
-                                }
-                            },
-                            modifier = Modifier.padding(top = 8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red.copy(alpha = 0.7f)
-                            ),
-                            shape = RoundedCornerShape(8.dp)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(7),
+                    modifier = Modifier.heightIn(max = 500.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(dias) { date ->
+                        val diaDelMes = date.dayOfMonth
+                        val esMesActual = date.month == mesActual
+                        val esHoy = date == LocalDate.now()
+                        val estaSeleccionado = fechaSeleccionada == date
+                        val tieneEntrenamiento = fechasConEntrenamiento.contains(date)
+                        val tieneNota = notasEntrenamiento.containsKey(date)
+
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clickable { fechaSeleccionada = date },
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text("Eliminar Nota")
+                            if (esHoy) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(50))
+                                        .background(Color.Red.copy(alpha = 0.8f))
+                                )
+                            }
+
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = diaDelMes.toString(),
+                                    color = when {
+                                        !esMesActual -> Color.Gray
+                                        estaSeleccionado -> MaterialTheme.colorScheme.onPrimary
+                                        else -> Color.White
+                                    },
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+
+                                if (tieneEntrenamiento || tieneNota) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                        if (tieneEntrenamiento) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(6.dp)
+                                                    .clip(RoundedCornerShape(50))
+                                                    .background(Color.Yellow)
+                                            )
+                                        }
+                                        if (tieneNota) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(6.dp)
+                                                    .clip(RoundedCornerShape(50))
+                                                    .background(Color(0xFF9C27B0))
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                fechaSeleccionada?.let { date ->
+                    val notaGuardada = notasEntrenamiento[date]
+                    var editarNota by remember { mutableStateOf(false) }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Black)
+                            .padding(top = 10.dp, bottom = 15.dp)
+                            .padding(horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Notas del ${date.dayOfMonth} de ${
+                                date.month.getDisplayName(
+                                    TextStyle.FULL,
+                                    Locale.getDefault()
+                                )
+                            }",
+                            color = Color.Gray,
+                            fontSize = 10.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        notaGuardada?.let { nota ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 10.dp, end = 15.dp, start = 15.dp)
+                                    .clickable {
+                                        editarNota = true
+                                        notaTexto = nota
+                                    },
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color.Black
+                                ),
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = nota,
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+
+                        }
+
+                        if (editarNota || notaGuardada == null) {
+                            TextField(
+                                value = notaTexto,
+                                onValueChange = { notaTexto = it },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color.White.copy(alpha = 0.05f)),
+                                placeholder = {
+                                    Text(
+                                        if (notaGuardada == null) "Escribe tus notas aquí..."
+                                        else "Editar nota existente...",
+                                        color = Color.Gray
+                                    )
+                                },
+                                textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
+                                    cursorColor = Color.Yellow
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                singleLine = false,
+                                maxLines = 5
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                if (notaGuardada != null) {
+                                    Button(
+                                        onClick = {
+                                            calendarViewModel.eliminarNota(date)
+                                            notaTexto = ""
+                                            editarNota = false
+                                        },
+                                        modifier = Modifier
+                                            .padding(top = 8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Red.copy(alpha = 0.7f)
+                                        ),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Eliminar nota",
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                    }
+                                }
+
+                                Button(
+                                    onClick = {
+                                        calendarViewModel.guardarEntrenamiento(date, notaTexto)
+                                        notaTexto = ""
+                                        editarNota = false
+                                    },
+                                    modifier = Modifier
+                                        .padding(top = 8.dp),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = if (notaGuardada == null) Icons.Filled.Done else Icons.AutoMirrored.Filled.Send,
+                                        contentDescription = "Actualizar nota",
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+
+                            }
+
                         }
                     }
                 }

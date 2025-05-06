@@ -61,15 +61,16 @@ fun PaginaEntrenamiento(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(236, 240, 241)),
+            .background(Color(25, 25, 25 )),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+        Spacer(modifier = Modifier.height(5.dp))
         CrearNuevoEntreanmiento(navController)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(236, 240, 241)),
+                .background(Color(25, 25, 25 )),
             contentAlignment = Alignment.Center
         ) {
             if (bloques.isNotEmpty()) {
@@ -92,8 +93,8 @@ fun PaginaEntrenamiento(
             } else {
                 Text(
                     text = "No hay entrenamientos disponibles",
-                    color = Color.Black,
-                    fontSize = 18.sp
+                    color = Color.Gray,
+                    fontSize = 14.sp
                 )
             }
         }
@@ -114,7 +115,7 @@ fun CrearNuevoEntreanmiento(navController: NavController) {
         modifier = Modifier
             .height(70.dp)
             .fillMaxWidth()
-            .padding(start = 45.dp, end = 45.dp, top = 10.dp, bottom = 10.dp)
+            .padding(start = 45.dp, end = 45.dp, top = 15.dp, bottom = 10.dp)
             .clip(RoundedCornerShape(10.dp))
             .shadow(10.dp, RoundedCornerShape(10.dp))
     ) {

@@ -100,14 +100,12 @@ class CalendarViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // Estructura de datos para guardar en Firestore
                 val notaData = hashMapOf(
                     "fecha" to fecha.toString(),
                     "nota" to nota,
                     "timestamp" to FieldValue.serverTimestamp()
                 )
 
-                // Actualizar el documento del usuario
                 userDocRef.set(
                     hashMapOf(
                         "notasCalendario" to hashMapOf(
@@ -117,14 +115,14 @@ class CalendarViewModel : ViewModel() {
                     SetOptions.merge()
                 ).await()
 
-                // Actualizar estado local
-                _fechasConEntrenamiento.value += fecha
                 _notasEntrenamiento.value += (fecha to nota)
+
             } catch (e: Exception) {
                 Log.e("CalendarVM", "Error al guardar nota", e)
             }
         }
     }
+
 
     fun cargarNotas() {
         val userDocRef = getUsuarioDocRef() ?: return
